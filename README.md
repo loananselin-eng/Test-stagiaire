@@ -165,3 +165,4 @@ Après ajout des variables → **Redeploy**.
 - **Nombre de questions** : modifier `NB_QUESTIONS = 20` dans `index.html`
 - **Temps par question** : configurable par session dans l'interface admin
 - **Thèmes / sujets** : gérés via le champ `theme` dans la banque de questions
+# Test-stagiaire
