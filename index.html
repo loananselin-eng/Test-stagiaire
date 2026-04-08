@@ -9,21 +9,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #050d1a;
-      --bg-dark: #0a1628;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --bg-card-hover: rgba(255, 255, 255, 0.07);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-accent: rgba(59, 130, 246, 0.4);
-      --blue-primary: #3b82f6;
-      --blue-light: #60a5fa;
-      --blue-glow: rgba(59, 130, 246, 0.15);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #475569;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
+      --bg-deep: #f0f4f8;
+      --bg-dark: #e8eef5;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --border: #e2e8f0;
+      --border-accent: rgba(37, 99, 235, 0.4);
+      --blue-primary: #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow: rgba(37, 99, 235, 0.15);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +31,7 @@
     html, body {
       height: 100%;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-dark) 100%) fixed;
+      background: #f0f4f8;
       color: var(--text-primary);
       overflow-x: hidden;
     }
@@ -100,9 +100,9 @@
     }
 
     .access-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 48px 40px;
       width: 100%;
@@ -154,8 +154,8 @@
     input[type="text"],
     input[type="email"] {
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 0.5px solid var(--border);
+      background: #f8fafc;
+      border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: 8px;
       padding: 12px 14px;
@@ -221,9 +221,9 @@
     }
 
     .briefing-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 48px 40px;
       width: 100%;
@@ -284,9 +284,8 @@
     .test-header {
       position: sticky;
       top: 0;
-      background: rgba(5, 13, 26, 0.9);
-      backdrop-filter: blur(20px);
-      border-bottom: 0.5px solid var(--border);
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
       padding: 16px 32px;
       display: flex;
       align-items: center;
@@ -362,9 +361,9 @@
     }
     .context-panel.visible { display: block; }
     .context-panel-inner {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
       max-height: calc(100vh - 180px);
@@ -433,8 +432,8 @@
       display: flex;
       align-items: flex-start;
       gap: 14px;
-      background: var(--bg-card);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px 20px;
       cursor: pointer;
@@ -516,9 +515,9 @@
     }
 
     .end-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 60px 48px;
       width: 100%;
@@ -571,9 +570,9 @@
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 14px 20px;
       font-size: 13px;

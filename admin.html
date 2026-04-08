@@ -9,34 +9,32 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #050d1a;
-      --bg-dark: #0a1628;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --bg-card-hover: rgba(255, 255, 255, 0.07);
-      --border: rgba(255, 255, 255, 0.08);
+      --bg-deep: #f0f4f8;
+      --bg-dark: #e8eef5;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --border: #e2e8f0;
       --border-accent: rgba(59, 130, 246, 0.4);
-      --blue-primary: #3b82f6;
-      --blue-light: #60a5fa;
-      --blue-glow: rgba(59, 130, 246, 0.15);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #475569;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
+      --blue-primary: #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow: rgba(37, 99, 235, 0.15);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       height: 100%;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-dark) 100%) fixed;
+      background: #f0f4f8;
       color: var(--text-primary);
     }
 
     /* Blobs */
-    .blob { position: fixed; border-radius: 50%; pointer-events: none; z-index: -1; opacity: 0.03; }
-    .blob-1 { width: 600px; height: 600px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: -200px; right: -200px; }
-    .blob-2 { width: 500px; height: 500px; background: radial-gradient(circle, #8b5cf6, transparent 70%); bottom: -150px; left: -150px; }
+    .blob { display: none; }
 
     /* ============================================================ LOGIN ============================================================ */
     #login-screen {
@@ -46,9 +44,9 @@
       min-height: 100vh;
     }
     .login-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 48px 40px;
       width: 100%;
@@ -62,9 +60,8 @@
     #admin-app.visible { display: flex; }
 
     .app-header {
-      background: rgba(5, 13, 26, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 0.5px solid var(--border);
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
       padding: 0 32px;
       display: flex;
       align-items: center;
@@ -100,8 +97,8 @@
     .tab-bar {
       display: flex;
       gap: 0;
-      background: rgba(5, 13, 26, 0.95);
-      border-bottom: 0.5px solid var(--border);
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
       padding: 0 32px;
       flex-shrink: 0;
     }
@@ -129,8 +126,8 @@
     input[type="text"], input[type="email"], input[type="password"],
     input[type="number"], select, textarea {
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 0.5px solid var(--border);
+      background: #f8fafc;
+      border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: 8px;
       padding: 10px 12px;
@@ -146,7 +143,7 @@
       background: rgba(59, 130, 246, 0.05);
     }
     input::placeholder, textarea::placeholder { color: var(--text-muted); }
-    select option { background: #0a1628; color: var(--text-primary); }
+    select option { background: #ffffff; color: var(--text-primary); }
 
     .btn-primary {
       background: var(--blue-primary);
@@ -211,9 +208,9 @@
 
     /* Card */
     .card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
       margin-bottom: 20px;
@@ -299,8 +296,8 @@
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: #0a1628;
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 32px;
       width: 100%;
