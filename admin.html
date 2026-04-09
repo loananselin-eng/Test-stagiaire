@@ -828,6 +828,8 @@
       <label>Description / instructions complémentaires</label>
       <textarea id="comp-description" rows="4"
                 placeholder="Optionnel — contexte, données clés, focus attendu pour le one pager"></textarea>
+      <label>Template URL</label>
+      <input type="text" id="comp-template-url" placeholder="https://… (lien vers un modèle de document)">
       <label>Consigne</label>
       <textarea id="comp-consigne" rows="5"
                 placeholder="Consigne transmise au candidat pour ce one pager"></textarea>
@@ -1440,7 +1442,7 @@ async function loadOpSocietes() {
 }
 
 function openCompanyModal(compId) {
-  ['comp-id','comp-nom','comp-secteur','comp-description','comp-consigne'].forEach(id => {
+  ['comp-id','comp-nom','comp-secteur','comp-description','comp-template-url','comp-consigne'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('modal-comp-title').textContent = 'Nouvelle société';
@@ -1451,8 +1453,9 @@ function openCompanyModal(compId) {
       document.getElementById('comp-id').value          = s.id;
       document.getElementById('comp-nom').value         = s.nom || '';
       document.getElementById('comp-secteur').value     = s.secteur || '';
-      document.getElementById('comp-description').value = s.description || '';
-      document.getElementById('comp-consigne').value    = s.consigne || '';
+      document.getElementById('comp-description').value    = s.description    || '';
+      document.getElementById('comp-template-url').value  = s.template_url   || '';
+      document.getElementById('comp-consigne').value       = s.consigne       || '';
     }
   }
   document.getElementById('modal-op-company').classList.add('open');
@@ -1467,8 +1470,9 @@ async function saveOpCompany(e) {
   const payload = {
     nom:         document.getElementById('comp-nom').value.trim(),
     secteur:     document.getElementById('comp-secteur').value.trim() || null,
-    description: document.getElementById('comp-description').value.trim() || null,
-    consigne:    document.getElementById('comp-consigne').value.trim() || null,
+    description:  document.getElementById('comp-description').value.trim()   || null,
+    template_url: document.getElementById('comp-template-url').value.trim() || null,
+    consigne:     document.getElementById('comp-consigne').value.trim()      || null,
     actif:       true,
   };
   try {
