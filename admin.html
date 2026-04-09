@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AUDUN Partners — Administration QCM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #050d1a;
+      --bg-dark: #0a1628;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.07);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(59, 130, 246, 0.4);
+      --blue-primary: #3b82f6;
+      --blue-light: #60a5fa;
+      --blue-glow: rgba(59, 130, 246, 0.15);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #475569;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-dark) 100%) fixed;
+      color: var(--text-primary);
+    }
+
+    /* Blobs */
+    .blob { position: fixed; border-radius: 50%; pointer-events: none; z-index: -1; opacity: 0.03; }
+    .blob-1 { width: 600px; height: 600px; background: radial-gradient(circle, #3b82f6, transparent 70%); top: -200px; right: -200px; }
+    .blob-2 { width: 500px; height: 500px; background: radial-gradient(circle, #8b5cf6, transparent 70%); bottom: -150px; left: -150px; }
+
+    /* ============================================================ LOGIN ============================================================ */
+    #login-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .login-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 380px;
+    }
+    .login-card h1 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .login-card p { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
+
+    /* ============================================================ ADMIN APP ============================================================ */
+    #admin-app { display: none; height: 100vh; flex-direction: column; }
+    #admin-app.visible { display: flex; }
+
+    .app-header {
+      background: rgba(5, 13, 26, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 0.5px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      flex-shrink: 0;
+    }
+    .app-logo { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .app-logo img { height: 28px; object-fit: contain; }
+    .app-logo-badge {
+      font-size: 11px;
+      background: rgba(59,130,246,0.15);
+      border: 0.5px solid var(--border-accent);
+      color: var(--blue-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .btn-logout {
+      background: transparent;
+      border: 0.5px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 200ms ease;
+    }
+    .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      background: rgba(5, 13, 26, 0.95);
+      border-bottom: 0.5px solid var(--border);
+      padding: 0 32px;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 14px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 200ms ease;
+    }
+    .tab-btn:hover { color: var(--text-secondary); }
+    .tab-btn.active { color: var(--blue-primary); border-bottom-color: var(--blue-primary); }
+
+    /* Tab content */
+    .tab-content { display: none; flex: 1; overflow-y: auto; padding: 32px; }
+    .tab-content.active { display: block; }
+
+    /* ============================================================ SHARED COMPONENTS ============================================================ */
+    label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+    input[type="text"], input[type="email"], input[type="password"],
+    input[type="number"], select, textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 0.5px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 200ms ease, background 200ms ease;
+      margin-bottom: 16px;
+    }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--border-accent);
+      background: rgba(59, 130, 246, 0.05);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    select option { background: #0a1628; color: var(--text-primary); }
+
+    .btn-primary {
+      background: var(--blue-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 200ms ease, box-shadow 200ms ease;
+    }
+    .btn-primary:hover { background: var(--blue-light); box-shadow: 0 0 16px var(--blue-glow); }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 200ms ease;
+    }
+    .btn-secondary:hover { border-color: var(--border-accent); color: var(--text-primary); }
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 0.5px solid rgba(239,68,68,0.3);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 200ms ease;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    /* Section header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .section-header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 10px 12px;
+      border-bottom: 0.5px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 13px;
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr.clickable:hover td { background: var(--bg-card-hover); cursor: pointer; }
+
+    /* Badge fraude */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-ok      { background: rgba(16,185,129,0.15); color: var(--success); }
+    .badge-suspicion { background: rgba(245,158,11,0.15); color: var(--warning); }
+    .badge-alerte  { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .badge-encours { background: rgba(59,130,246,0.15); color: var(--blue-light); }
+
+    /* Toggle */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--text-muted);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 200ms ease;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      left: 3px; bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 200ms ease;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--blue-primary); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px;
+      overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #0a1628;
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 720px;
+      position: relative;
+      animation: fadeIn 200ms ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .modal-header h3 { font-size: 17px; font-weight: 700; }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      transition: color 200ms ease;
+    }
+    .modal-close:hover { color: var(--text-primary); }
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    /* Form grid */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+    .form-grid .full { grid-column: 1 / -1; }
+
+    /* Stat cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 28px; font-weight: 700; margin-top: 6px; }
+
+    /* Candidate detail */
+    .qa-row {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.02);
+    }
+    .qa-status { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .qa-content { flex: 1; }
+    .qa-question { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+    .qa-answer { font-size: 12px; }
+    .qa-correct { color: var(--success); }
+    .qa-wrong   { color: var(--danger); }
+
+    /* Timeline */
+    .timeline { display: flex; flex-direction: column; gap: 8px; }
+    .timeline-event {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .timeline-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--warning);
+      flex-shrink: 0;
+    }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state p { margin-top: 8px; font-size: 13px; }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-row td { text-align: center; color: var(--text-muted); padding: 40px; }
+  </style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<!-- ============================================================
+     LOGIN
+============================================================ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:28px">
+      <img src="logo.png" alt="AUDUN Partners" style="height:40px;object-fit:contain"
+           onerror="this.style.display='none'">
+      <div style="font-size:18px;font-weight:700;margin-top:8px">AUDUN Partners</div>
+    </div>
+    <h1>Administration QCM</h1>
+    <p>Accès réservé à l'équipe interne</p>
+    <label for="admin-pwd">Mot de passe</label>
+    <input type="password" id="admin-pwd" placeholder="••••••••"
+           onkeydown="if(event.key==='Enter')login()">
+    <div id="login-error" style="color:var(--danger);font-size:13px;display:none;margin-top:-10px;margin-bottom:12px">
+      Mot de passe incorrect.
+    </div>
+    <button class="btn-primary" onclick="login()" style="width:100%">Se connecter</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     ADMIN APP
+============================================================ -->
+<div id="admin-app">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-logo">
+      <img src="logo.png" alt="AUDUN" onerror="this.style.display='none'">
+      AUDUN Partners
+      <span class="app-logo-badge">Admin</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('questions')">Questions</button>
+    <button class="tab-btn" onclick="switchTab('sessions')">Sessions</button>
+    <button class="tab-btn" onclick="switchTab('parametres')">Paramètres</button>
+  </nav>
+
+  <!-- ============================================================
+       TAB: DASHBOARD
+  ============================================================ -->
+  <div id="tab-dashboard" class="tab-content active">
+
+    <div class="section-header">
+      <div>
+        <h2>Dashboard</h2>
+        <p>Tous les candidats ayant démarré ou soumis un test</p>
+      </div>
+      <button class="btn-secondary" onclick="loadDashboard()">↻ Actualiser</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Soumis</div><div class="stat-value" id="stat-soumis">—</div></div>
+      <div class="stat-card"><div class="stat-label">En cours</div><div class="stat-value" id="stat-encours">—</div></div>
+      <div class="stat-card"><div class="stat-label">Alertes fraude</div><div class="stat-value" id="stat-fraude" style="color:var(--danger)">—</div></div>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table id="candidates-table">
+          <thead>
+            <tr>
+              <th>Candidat</th>
+              <th>Email</th>
+              <th>Session</th>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Durée</th>
+              <th>Score</th>
+              <th>Fraude</th>
+            </tr>
+          </thead>
+          <tbody id="candidates-tbody">
+            <tr class="loading-row"><td colspan="8"><span class="spinner"></span>Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB: QUESTIONS
+  ============================================================ -->
+  <div id="tab-questions" class="tab-content">
+    <div class="section-header">
+      <div>
+        <h2>Banque de questions</h2>
+        <p id="questions-count">—</p>
+      </div>
+      <button class="btn-primary" onclick="openQuestionModal()">+ Nouvelle question</button>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Thème</th>
+              <th>Difficulté</th>
+              <th>Énoncé</th>
+              <th>Actif</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="questions-tbody">
+            <tr class="loading-row"><td colspan="5"><span class="spinner"></span>Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB: SESSIONS
+  ============================================================ -->
+  <div id="tab-sessions" class="tab-content">
+    <div class="section-header">
+      <div>
+        <h2>Sessions</h2>
+        <p>Gérez les sessions de test et les codes d'accès</p>
+      </div>
+      <button class="btn-primary" onclick="openSessionModal()">+ Nouvelle session</button>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Promo / Label</th>
+              <th>Code</th>
+              <th>Temps/Q (s)</th>
+              <th>Soumis</th>
+              <th>En cours</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sessions-tbody">
+            <tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB: PARAMÈTRES
+  ============================================================ -->
+  <div id="tab-parametres" class="tab-content">
+    <div class="section-header">
+      <div><h2>Paramètres</h2></div>
+    </div>
+
+    <div class="card" style="max-width:520px">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:20px">Notifications</h3>
+      <label for="admin-email-setting">Adresse email admin (notifications)</label>
+      <input type="email" id="admin-email-setting" placeholder="recrutement@audun-partners.com">
+      <button class="btn-primary" onclick="saveAdminEmail()">Enregistrer</button>
+      <div id="email-saved" style="display:none;color:var(--success);font-size:13px;margin-top:8px">
+        ✓ Enregistré localement
+      </div>
+    </div>
+
+    <div class="card" style="max-width:520px">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:20px">Logo</h3>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+        Uploadez un logo (PNG ou SVG, fond transparent recommandé).
+        Le fichier sera stocké dans Supabase Storage et utilisé sur l'interface candidat.
+      </p>
+      <label for="logo-upload">Fichier logo</label>
+      <input type="file" id="logo-upload" accept="image/png,image/svg+xml,image/jpeg"
+             style="padding:8px;cursor:pointer">
+      <button class="btn-primary" style="margin-top:4px" onclick="uploadLogo()">
+        Uploader le logo
+      </button>
+      <div id="logo-status" style="margin-top:10px;font-size:13px;color:var(--text-secondary)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Détail candidat
+============================================================ -->
+<div id="modal-candidate" class="modal-overlay">
+  <div class="modal" style="max-width:780px">
+    <div class="modal-header">
+      <h3 id="modal-cand-title">Détail candidat</h3>
+      <button class="modal-close" onclick="closeModal('modal-candidate')">&times;</button>
+    </div>
+    <div id="modal-cand-body"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="exportCandidateCSV()">↓ Exporter CSV</button>
+      <button class="btn-secondary" onclick="closeModal('modal-candidate')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Question (create / edit)
+============================================================ -->
+<div id="modal-question" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-q-title">Nouvelle question</h3>
+      <button class="modal-close" onclick="closeModal('modal-question')">&times;</button>
+    </div>
+    <form onsubmit="saveQuestion(event)">
+      <input type="hidden" id="q-id">
+      <div class="form-grid">
+        <div class="full">
+          <label>Énoncé *</label>
+          <textarea id="q-enonce" rows="3" required placeholder="Rédigez l'énoncé de la question…"></textarea>
+        </div>
+        <div class="full">
+          <label>Contexte (HTML libre — états financiers, tableaux…)</label>
+          <textarea id="q-contexte" rows="5" placeholder="Optionnel. HTML accepté."></textarea>
+        </div>
+        <div>
+          <label>Option A *</label>
+          <input type="text" id="q-option-a" required>
+        </div>
+        <div>
+          <label>Option B *</label>
+          <input type="text" id="q-option-b" required>
+        </div>
+        <div>
+          <label>Option C *</label>
+          <input type="text" id="q-option-c" required>
+        </div>
+        <div>
+          <label>Option D *</label>
+          <input type="text" id="q-option-d" required>
+        </div>
+        <div>
+          <label>Bonne réponse *</label>
+          <select id="q-bonne-reponse" required>
+            <option value="">— Sélectionner —</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+        <div>
+          <label>Difficulté</label>
+          <select id="q-difficulte">
+            <option value="">—</option>
+            <option value="Facile">Facile</option>
+            <option value="Intermédiaire">Intermédiaire</option>
+            <option value="Difficile">Difficile</option>
+          </select>
+        </div>
+        <div>
+          <label>Thème</label>
+          <input type="text" id="q-theme" placeholder="Ex : LBO, Valorisation…">
+        </div>
+        <div class="full">
+          <label>Explication (affichée aux admins)</label>
+          <textarea id="q-explication" rows="3" placeholder="Optionnel — correction interne"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modal-question')">Annuler</button>
+        <button type="submit" class="btn-primary" id="btn-save-q">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Session (create)
+============================================================ -->
+<div id="modal-session" class="modal-overlay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h3>Nouvelle session</h3>
+      <button class="modal-close" onclick="closeModal('modal-session')">&times;</button>
+    </div>
+    <form onsubmit="saveSession(event)">
+      <label>Label / Promo</label>
+      <input type="text" id="s-promo" placeholder="Ex : Promotion Printemps 2025" required>
+      <label>Code d'accès *</label>
+      <input type="text" id="s-code" placeholder="Ex : AUDUN2025" required
+             style="text-transform:uppercase"
+             oninput="this.value=this.value.toUpperCase()">
+      <label>Temps par question (secondes)</label>
+      <input type="number" id="s-temps" value="25" min="5" max="300">
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modal-session')">Annuler</button>
+        <button type="submit" class="btn-primary">Créer la session</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const SUPABASE_URL  = '__SUPABASE_URL__';
+const SUPABASE_ANON = '__SUPABASE_ANON_KEY__';
+// ADMIN_PASSWORD est lu depuis localStorage (défini côté Vercel env → non exposable).
+// Alternative : stocker un hash en localStorage après première connexion.
+// Pour l'instant, comparaison directe avec le mot de passe stocké en localStorage.
+const ADMIN_PWD_KEY = 'audun_admin_pwd';
+
+// ============================================================
+// STATE
+// ============================================================
+let currentCandidateData = null; // pour l'export CSV
+let allQuestions = [];
+let allSessions  = [];
+let allCandidates = [];
+
+// ============================================================
+// SUPABASE HELPERS
+// ============================================================
+async function sbFetch(path, opts = {}) {
+  const url = SUPABASE_URL + path;
+  const headers = {
+    'apikey': SUPABASE_ANON,
+    'Authorization': 'Bearer ' + SUPABASE_ANON,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
+    ...opts.headers,
+  };
+  const res = await fetch(url, { ...opts, headers });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Supabase ${res.status}: ${text}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+function login() {
+  const pwd = document.getElementById('admin-pwd').value;
+  const stored = localStorage.getItem(ADMIN_PWD_KEY);
+
+  // Premier lancement : stocker le mot de passe
+  if (!stored) {
+    if (pwd.length < 6) {
+      document.getElementById('login-error').textContent = 'Mot de passe trop court (6 caractères min).';
+      document.getElementById('login-error').style.display = 'block';
+      return;
+    }
+    localStorage.setItem(ADMIN_PWD_KEY, pwd);
+    showApp();
+    return;
+  }
+
+  if (pwd === stored) {
+    showApp();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-app').classList.add('visible');
+  loadDashboard();
+  loadAdminEmailSetting();
+}
+
+function logout() {
+  document.getElementById('admin-app').classList.remove('visible');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('admin-pwd').value = '';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+
+  if (name === 'questions') loadQuestions();
+  if (name === 'sessions')  loadSessions();
+}
+
+// ============================================================
+// TAB: DASHBOARD
+// ============================================================
+async function loadDashboard() {
+  const tbody = document.getElementById('candidates-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Chargement…</td></tr>';
+
+  try {
+    const [candidates, sessions] = await Promise.all([
+      sbFetch('/rest/v1/candidates?select=*&order=submitted_at.desc.nullslast'),
+      sbFetch('/rest/v1/sessions?select=id,promo,code'),
+    ]);
+
+    allCandidates = candidates || [];
+    const sessMap = {};
+    (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
+
+    // Stats
+    const soumis   = allCandidates.filter(c => c.statut === 'soumis').length;
+    const encours  = allCandidates.filter(c => c.statut === 'en_cours').length;
+    const alertes  = allCandidates.filter(c => c.fraude_flag === 'alerte').length;
+    document.getElementById('stat-total').textContent   = allCandidates.length;
+    document.getElementById('stat-soumis').textContent  = soumis;
+    document.getElementById('stat-encours').textContent = encours;
+    document.getElementById('stat-fraude').textContent  = alertes;
+
+    if (allCandidates.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucun candidat enregistré.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = allCandidates.map(c => {
+      const duree = c.started_at && c.submitted_at
+        ? Math.round((new Date(c.submitted_at) - new Date(c.started_at)) / 60000) + ' min'
+        : '—';
+      const score = c.statut === 'soumis'
+        ? `<strong>${c.score} / ${c.score_max || 20}</strong>`
+        : '<span style="color:var(--text-muted)">En cours</span>';
+      const fraudeBadge = fraudeBadgeHtml(c.fraude_flag);
+      const submittedAt = c.submitted_at ? fmtDate(c.submitted_at) : '—';
+      const startedAt   = c.started_at   ? fmtDate(c.started_at)   : '—';
+
+      return `<tr class="clickable" onclick="openCandidateModal('${c.id}')">
+        <td><strong style="color:var(--text-primary)">${c.prenom} ${c.nom}</strong></td>
+        <td>${c.email}</td>
+        <td>${sessMap[c.session_id] || '—'}</td>
+        <td>${startedAt}</td>
+        <td>${submittedAt}</td>
+        <td>${duree}</td>
+        <td>${score}</td>
+        <td>${fraudeBadge}</td>
+      </tr>`;
+    }).join('');
+
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--danger);padding:24px">
+      Erreur : ${e.message}</td></tr>`;
+  }
+}
+
+function fraudeBadgeHtml(flag) {
+  if (flag === 'alerte')   return '<span class="badge badge-alerte">Alerte</span>';
+  if (flag === 'suspicion') return '<span class="badge badge-suspicion">Suspicion</span>';
+  return '<span class="badge badge-ok">OK</span>';
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('fr-FR', {
+    day: '2-digit', month: '2-digit', year: '2-digit',
+    hour: '2-digit', minute: '2-digit',
+  });
+}
+
+// ============================================================
+// MODAL — Détail candidat
+// ============================================================
+async function openCandidateModal(candidateId) {
+  const modal = document.getElementById('modal-candidate');
+  const body  = document.getElementById('modal-cand-body');
+  modal.classList.add('open');
+  body.innerHTML = '<div style="text-align:center;padding:40px"><span class="spinner"></span>Chargement…</div>';
+
+  try {
+    const [cands, fraudEvs] = await Promise.all([
+      sbFetch(`/rest/v1/candidates?id=eq.${candidateId}&select=*`),
+      sbFetch(`/rest/v1/fraud_events?candidate_id=eq.${candidateId}&select=*&order=timestamp.asc`),
+    ]);
+
+    const c = cands[0];
+    currentCandidateData = { candidate: c, fraudEvents: fraudEvs || [] };
+
+    document.getElementById('modal-cand-title').textContent =
+      `${c.prenom} ${c.nom} — ${c.email}`;
+
+    let qaHtml = '<div style="margin-bottom:24px">';
+    let correctCount = 0;
+
+    if (c.questions_tirees && c.questions_tirees.length > 0) {
+      const qs = await sbFetch(
+        `/rest/v1/questions?id=in.(${c.questions_tirees.join(',')})&select=*`
+      );
+      const qMap = {};
+      (qs || []).forEach(q => { qMap[q.id] = q; });
+
+      c.questions_tirees.forEach((qid, i) => {
+        const q = qMap[qid];
+        if (!q) return;
+        const given    = c.reponses?.[qid];
+        const correct  = q.bonne_reponse;
+        const isOk     = given === correct;
+        if (isOk) correctCount++;
+
+        qaHtml += `<div class="qa-row">
+          <div class="qa-status">${isOk ? '✓' : '✗'}</div>
+          <div class="qa-content">
+            <div class="qa-question"><strong>Q${i+1}</strong> — ${q.enonce}</div>
+            <div class="qa-answer">
+              <span class="${isOk ? 'qa-correct' : 'qa-wrong'}">
+                Réponse donnée : ${given || '(aucune)'}
+              </span>
+              ${!isOk ? `<span style="color:var(--success);margin-left:12px">
+                Bonne réponse : ${correct}</span>` : ''}
+            </div>
+            ${q.explication ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px">${q.explication}</div>` : ''}
+          </div>
+        </div>`;
+      });
+    } else {
+      qaHtml += '<p style="color:var(--text-muted);font-size:13px">Aucune question enregistrée.</p>';
+    }
+    qaHtml += '</div>';
+
+    // Timeline fraude
+    let fraudHtml = '<h4 style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:12px">Événements de fraude</h4>';
+    if (fraudEvs && fraudEvs.length > 0) {
+      fraudHtml += '<div class="timeline">' + fraudEvs.map(e => `
+        <div class="timeline-event">
+          <div class="timeline-dot"></div>
+          <div><strong>${e.type}</strong> — ${fmtDate(e.timestamp)}${e.details ? ` — ${e.details}` : ''}</div>
+        </div>`).join('') + '</div>';
+    } else {
+      fraudHtml += '<p style="color:var(--text-muted);font-size:13px">Aucun événement détecté.</p>';
+    }
+
+    body.innerHTML = `
+      <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div class="stat-card" style="flex:1;min-width:140px">
+          <div class="stat-label">Score</div>
+          <div class="stat-value">${c.score ?? '—'} / ${c.score_max || 20}</div>
+        </div>
+        <div class="stat-card" style="flex:1;min-width:140px">
+          <div class="stat-label">Statut</div>
+          <div class="stat-value" style="font-size:16px;margin-top:12px">
+            ${c.statut === 'soumis'
+              ? '<span class="badge badge-ok">Soumis</span>'
+              : '<span class="badge badge-encours">En cours</span>'}
+          </div>
+        </div>
+        <div class="stat-card" style="flex:1;min-width:140px">
+          <div class="stat-label">Fraude</div>
+          <div class="stat-value" style="font-size:16px;margin-top:12px">${fraudeBadgeHtml(c.fraude_flag)}</div>
+        </div>
+      </div>
+      <h4 style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:12px">
+        Réponses (${correctCount} / ${c.questions_tirees?.length || 20} correctes)
+      </h4>
+      <div style="max-height:300px;overflow-y:auto;margin-bottom:24px">${qaHtml}</div>
+      <div class="card" style="padding:16px">${fraudHtml}</div>`;
+
+  } catch (e) {
+    body.innerHTML = `<p style="color:var(--danger)">Erreur : ${e.message}</p>`;
+  }
+}
+
+function exportCandidateCSV() {
+  if (!currentCandidateData) return;
+  const { candidate: c } = currentCandidateData;
+  const rows = [['Question ID', 'Réponse donnée']];
+  if (c.reponses) {
+    Object.entries(c.reponses).forEach(([qid, rep]) => {
+      rows.push([qid, rep || '']);
+    });
+  }
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${c.nom}_${c.prenom}_reponses.csv`;
+  a.click();
+}
+
+// ============================================================
+// TAB: QUESTIONS
+// ============================================================
+async function loadQuestions() {
+  const tbody = document.getElementById('questions-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="5"><span class="spinner"></span>Chargement…</td></tr>';
+
+  try {
+    allQuestions = await sbFetch('/rest/v1/questions?select=*&order=created_at.desc') || [];
+    document.getElementById('questions-count').textContent =
+      `${allQuestions.filter(q => q.actif).length} actives / ${allQuestions.length} total`;
+
+    if (allQuestions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aucune question. Créez-en une !</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = allQuestions.map(q => `
+      <tr>
+        <td>${q.theme || '—'}</td>
+        <td>${q.difficulte || '—'}</td>
+        <td style="color:var(--text-primary)">${truncate(q.enonce, 80)}</td>
+        <td>
+          <label class="toggle">
+            <input type="checkbox" ${q.actif ? 'checked' : ''}
+                   onchange="toggleQuestion('${q.id}', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </td>
+        <td style="display:flex;gap:8px">
+          <button class="btn-secondary btn-sm" onclick="openQuestionModal('${q.id}')">Éditer</button>
+          <button class="btn-danger btn-sm" onclick="deleteQuestion('${q.id}')">Supprimer</button>
+        </td>
+      </tr>`).join('');
+
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--danger);padding:24px">${e.message}</td></tr>`;
+  }
+}
+
+function truncate(str, n) {
+  return str && str.length > n ? str.slice(0, n) + '…' : (str || '');
+}
+
+function openQuestionModal(qId) {
+  const modal = document.getElementById('modal-question');
+  // Reset
+  ['q-id','q-enonce','q-contexte','q-option-a','q-option-b',
+   'q-option-c','q-option-d','q-bonne-reponse','q-difficulte',
+   'q-theme','q-explication'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+  });
+
+  if (qId) {
+    const q = allQuestions.find(x => x.id === qId);
+    if (q) {
+      document.getElementById('modal-q-title').textContent = 'Modifier la question';
+      document.getElementById('q-id').value           = q.id;
+      document.getElementById('q-enonce').value       = q.enonce || '';
+      document.getElementById('q-contexte').value     = q.contexte || '';
+      document.getElementById('q-option-a').value     = q.option_a || '';
+      document.getElementById('q-option-b').value     = q.option_b || '';
+      document.getElementById('q-option-c').value     = q.option_c || '';
+      document.getElementById('q-option-d').value     = q.option_d || '';
+      document.getElementById('q-bonne-reponse').value = q.bonne_reponse || '';
+      document.getElementById('q-difficulte').value   = q.difficulte || '';
+      document.getElementById('q-theme').value        = q.theme || '';
+      document.getElementById('q-explication').value  = q.explication || '';
+    }
+  } else {
+    document.getElementById('modal-q-title').textContent = 'Nouvelle question';
+  }
+
+  modal.classList.add('open');
+}
+
+async function saveQuestion(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-save-q');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Enregistrement…';
+
+  const qId = document.getElementById('q-id').value;
+  const payload = {
+    enonce:        document.getElementById('q-enonce').value.trim(),
+    contexte:      document.getElementById('q-contexte').value.trim() || null,
+    option_a:      document.getElementById('q-option-a').value.trim(),
+    option_b:      document.getElementById('q-option-b').value.trim(),
+    option_c:      document.getElementById('q-option-c').value.trim(),
+    option_d:      document.getElementById('q-option-d').value.trim(),
+    bonne_reponse: document.getElementById('q-bonne-reponse').value,
+    difficulte:    document.getElementById('q-difficulte').value || null,
+    theme:         document.getElementById('q-theme').value.trim() || null,
+    explication:   document.getElementById('q-explication').value.trim() || null,
+    actif:         true,
+  };
+
+  try {
+    if (qId) {
+      await sbFetch(`/rest/v1/questions?id=eq.${qId}`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify(payload),
+      });
+    } else {
+      await sbFetch('/rest/v1/questions', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+    }
+    closeModal('modal-question');
+    loadQuestions();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enregistrer';
+  }
+}
+
+async function toggleQuestion(qId, active) {
+  try {
+    await sbFetch(`/rest/v1/questions?id=eq.${qId}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ actif: active }),
+    });
+    // Update local
+    const q = allQuestions.find(x => x.id === qId);
+    if (q) q.actif = active;
+    const count = allQuestions.filter(q => q.actif).length;
+    document.getElementById('questions-count').textContent =
+      `${count} actives / ${allQuestions.length} total`;
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
+async function deleteQuestion(qId) {
+  if (!confirm('Supprimer cette question ? Cette action est irréversible.')) return;
+  try {
+    await sbFetch(`/rest/v1/questions?id=eq.${qId}`, { method: 'DELETE' });
+    loadQuestions();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
+// ============================================================
+// TAB: SESSIONS
+// ============================================================
+async function loadSessions() {
+  const tbody = document.getElementById('sessions-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>';
+
+  try {
+    allSessions = await sbFetch('/rest/v1/sessions?select=*&order=created_at.desc') || [];
+    const candidates = await sbFetch('/rest/v1/candidates?select=session_id,statut') || [];
+
+    // Compter par session
+    const counts = {};
+    candidates.forEach(c => {
+      if (!counts[c.session_id]) counts[c.session_id] = { soumis: 0, encours: 0 };
+      if (c.statut === 'soumis') counts[c.session_id].soumis++;
+      else counts[c.session_id].encours++;
+    });
+
+    if (allSessions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucune session. Créez-en une !</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = allSessions.map(s => {
+      const cnt = counts[s.id] || { soumis: 0, encours: 0 };
+      const badge = s.actif
+        ? '<span class="badge badge-ok">Actif</span>'
+        : '<span class="badge" style="background:rgba(255,255,255,0.06);color:var(--text-muted)">Inactif</span>';
+      return `<tr>
+        <td style="color:var(--text-primary)">${s.promo || '—'}</td>
+        <td><code style="background:rgba(255,255,255,0.06);padding:3px 8px;border-radius:4px;font-size:12px">${s.code}</code></td>
+        <td>${s.temps_par_question}s</td>
+        <td>${cnt.soumis}</td>
+        <td>${cnt.encours}</td>
+        <td>${badge}</td>
+        <td style="display:flex;gap:8px">
+          <button class="btn-secondary btn-sm"
+            onclick="toggleSession('${s.id}', ${!s.actif})">
+            ${s.actif ? 'Désactiver' : 'Activer'}
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:24px">${e.message}</td></tr>`;
+  }
+}
+
+function openSessionModal() {
+  document.getElementById('s-promo').value = '';
+  document.getElementById('s-code').value  = '';
+  document.getElementById('s-temps').value = '25';
+  document.getElementById('modal-session').classList.add('open');
+}
+
+async function saveSession(e) {
+  e.preventDefault();
+  const promo = document.getElementById('s-promo').value.trim();
+  const code  = document.getElementById('s-code').value.trim().toUpperCase();
+  const temps = parseInt(document.getElementById('s-temps').value) || 25;
+
+  try {
+    await sbFetch('/rest/v1/sessions', {
+      method: 'POST',
+      body: JSON.stringify({ promo, code, temps_par_question: temps }),
+    });
+    closeModal('modal-session');
+    loadSessions();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
+async function toggleSession(sId, active) {
+  try {
+    await sbFetch(`/rest/v1/sessions?id=eq.${sId}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ actif: active }),
+    });
+    loadSessions();
+  } catch (err) {
+    alert('Erreur : ' + err.message);
+  }
+}
+
+// ============================================================
+// TAB: PARAMÈTRES
+// ============================================================
+function loadAdminEmailSetting() {
+  const email = localStorage.getItem('audun_admin_email') || '';
+  document.getElementById('admin-email-setting').value = email;
+}
+
+function saveAdminEmail() {
+  const email = document.getElementById('admin-email-setting').value.trim();
+  localStorage.setItem('audun_admin_email', email);
+  const saved = document.getElementById('email-saved');
+  saved.style.display = 'block';
+  setTimeout(() => { saved.style.display = 'none'; }, 2500);
+}
+
+async function uploadLogo() {
+  const file = document.getElementById('logo-upload').files[0];
+  const status = document.getElementById('logo-status');
+  if (!file) { status.textContent = 'Veuillez sélectionner un fichier.'; return; }
+
+  status.textContent = 'Upload en cours…';
+
+  try {
+    const ext = file.name.split('.').pop();
+    const path = `logo.${ext}`;
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/assets/${path}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': file.type,
+        'x-upsert': 'true',
+      },
+      body: file,
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/assets/${path}`;
+    status.innerHTML = `✓ Logo uploadé. <a href="${publicUrl}" target="_blank" style="color:var(--blue-light)">Voir</a>`;
+  } catch (err) {
+    status.style.color = 'var(--danger)';
+    status.textContent = 'Erreur : ' + err.message;
+  }
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Fermer en cliquant l'overlay
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+</script>
+
+</body>
+</html>
