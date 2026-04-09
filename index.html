@@ -1094,6 +1094,19 @@ Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mi
       <div class="op-instructions" id="op-company-description"></div>
     </div>
 
+    <div id="op-template-block" style="display:none;margin-bottom:24px">
+      <a id="op-template-link" href="#" target="_blank"
+         style="display:inline-flex;align-items:center;gap:8px;
+                background:var(--blue-primary);color:#fff;
+                border-radius:8px;padding:10px 18px;
+                font-size:14px;font-weight:600;text-decoration:none;
+                transition:background 200ms ease;"
+         onmouseover="this.style.background='var(--blue-light)'"
+         onmouseout="this.style.background='var(--blue-primary)'">
+        ↓ Télécharger le template
+      </a>
+    </div>
+
     <p class="op-section-title">Instructions</p>
     <div class="op-instructions" id="op-instructions">Chargement…</div>
 
@@ -1862,6 +1875,17 @@ function loadOpActiveScreen() {
     infoBlock.style.display = '';
   } else {
     infoBlock.style.display = 'none';
+  }
+
+  // Template download button
+  const templateUrl = state.opCompany?.template_url;
+  const templateBlock = document.getElementById('op-template-block');
+  const templateLink  = document.getElementById('op-template-link');
+  if (templateUrl && templateUrl.trim()) {
+    templateLink.href = templateUrl.trim();
+    templateBlock.style.display = '';
+  } else {
+    templateBlock.style.display = 'none';
   }
 
   document.getElementById('op-instructions').textContent =
