@@ -828,6 +828,9 @@
       <label>Description / instructions complémentaires</label>
       <textarea id="comp-description" rows="4"
                 placeholder="Optionnel — contexte, données clés, focus attendu pour le one pager"></textarea>
+      <label>Consigne</label>
+      <textarea id="comp-consigne" rows="5"
+                placeholder="Consigne transmise au candidat pour ce one pager"></textarea>
       <div class="modal-footer">
         <button type="button" class="btn-secondary" onclick="closeModal('modal-op-company')">Annuler</button>
         <button type="submit" class="btn-primary" id="btn-save-comp">Enregistrer</button>
@@ -1437,7 +1440,7 @@ async function loadOpSocietes() {
 }
 
 function openCompanyModal(compId) {
-  ['comp-id','comp-nom','comp-secteur','comp-description'].forEach(id => {
+  ['comp-id','comp-nom','comp-secteur','comp-description','comp-consigne'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('modal-comp-title').textContent = 'Nouvelle société';
@@ -1449,6 +1452,7 @@ function openCompanyModal(compId) {
       document.getElementById('comp-nom').value         = s.nom || '';
       document.getElementById('comp-secteur').value     = s.secteur || '';
       document.getElementById('comp-description').value = s.description || '';
+      document.getElementById('comp-consigne').value    = s.consigne || '';
     }
   }
   document.getElementById('modal-op-company').classList.add('open');
@@ -1464,6 +1468,7 @@ async function saveOpCompany(e) {
     nom:         document.getElementById('comp-nom').value.trim(),
     secteur:     document.getElementById('comp-secteur').value.trim() || null,
     description: document.getElementById('comp-description').value.trim() || null,
+    consigne:    document.getElementById('comp-consigne').value.trim() || null,
     actif:       true,
   };
   try {
