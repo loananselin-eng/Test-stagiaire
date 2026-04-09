@@ -1089,6 +1089,11 @@ Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mi
   </header>
 
   <div class="op-body">
+    <div id="op-company-info" style="display:none;margin-bottom:32px">
+      <p class="op-section-title">Informations société</p>
+      <div class="op-instructions" id="op-company-description"></div>
+    </div>
+
     <p class="op-section-title">Instructions</p>
     <div class="op-instructions" id="op-instructions">Chargement…</div>
 
@@ -1848,6 +1853,17 @@ async function startOnePager() {
 function loadOpActiveScreen() {
   const societe = state.opCompany?.nom || 'la société assignée';
   document.getElementById('op-active-company').textContent = societe;
+
+  // Informations société (description)
+  const desc = state.opCompany?.description;
+  const infoBlock = document.getElementById('op-company-info');
+  if (desc && desc.trim()) {
+    document.getElementById('op-company-description').textContent = desc.trim();
+    infoBlock.style.display = '';
+  } else {
+    infoBlock.style.display = 'none';
+  }
+
   document.getElementById('op-instructions').textContent =
     `Produisez un one pager sur ${societe}.\n\nCouvrez les points suivants :\n• Présentation de la société (activité, modèle économique, positionnement)\n• Analyse financière synthétique (croissance, rentabilité, bilan)\n• Positionnement M&A (rationale d'acquisition, valorisation indicative, synergies)\n\nFormat : PDF ou PowerPoint, 1 à 2 pages, sources libres.\n\nDéposez votre fichier via la zone ci-dessous, puis cliquez sur Soumettre.`;
 
