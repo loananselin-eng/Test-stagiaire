@@ -1578,21 +1578,22 @@ async function loadOpResultats() {
   tbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>';
   try {
     const [assignments, sessions, societes, candidates] = await Promise.all([
-      sbFetch('/rest/v1/onepager_assignments?statut=not.is.null&select=*&order=submitted_at.desc.nullslast'),
+      // Uniquement les assignments candidat (candidate_id non null) avec un statut
+      sbFetch('/rest/v1/onepager_assignments?candidate_id=not.is.null&statut=not.is.null&select=*&order=submitted_at.desc.nullslast'),
       sbFetch('/rest/v1/sessions?select=id,promo,code'),
       sbFetch('/rest/v1/onepager_companies?select=id,nom'),
       sbFetch('/rest/v1/candidates?select=id,prenom,nom,session_id'),
     ]);
     const sessMap = {}; (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
     const compMap = {}; (societes || []).forEach(s => { compMap[s.id] = s.nom; });
-    const candMap = {}; (candidates || []).forEach(c => { candMap[c.session_id] = c; });
+    const candMap = {}; (candidates || []).forEach(c => { candMap[c.id] = c; });
 
     if (!assignments || assignments.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun résultat.</td></tr>';
       return;
     }
     tbody.innerHTML = assignments.map(a => {
-      const cand = candMap[a.session_id] || {};
+      const cand = candMap[a.candidate_id] || {};
       const societe = compMap[a.company_id] || '—';
       const duree = a.started_at && a.submitted_at
         ? Math.round((new Date(a.submitted_at) - new Date(a.started_at)) / 60000) + ' min'

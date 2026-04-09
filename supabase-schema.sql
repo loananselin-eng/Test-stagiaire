@@ -136,6 +136,13 @@ create index if not exists idx_candidates_email    on candidates(email);
 create index if not exists idx_fraud_candidate     on fraud_events(candidate_id);
 
 -- ============================================================
+-- MIGRATION : one pager par candidat
+-- Exécuter dans Supabase SQL Editor si la colonne n'existe pas encore
+-- ============================================================
+alter table onepager_assignments add column if not exists candidate_id uuid references candidates(id);
+create index if not exists idx_op_assignments_candidate on onepager_assignments(candidate_id);
+
+-- ============================================================
 -- STORAGE (logo)
 -- ============================================================
 -- Exécuter manuellement dans l'éditeur Supabase si besoin :

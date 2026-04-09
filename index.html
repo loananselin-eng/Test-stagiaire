@@ -984,10 +984,15 @@ Toute suspicion de fraude entraîne la disqualification immédiate de votre cand
            onerror="this.style.display='none'">
     </div>
     <div class="end-icon">✓</div>
-    <div class="end-title" id="end-title">Merci, votre test a été enregistré.</div>
+    <div class="end-title" id="end-title">Test terminé</div>
     <div class="end-text" id="end-text">
-      L'équipe AUDUN Partners reviendra vers vous prochainement.
+      Votre résultat a bien été enregistré.
     </div>
+    <button class="btn-primary" id="btn-end-continue"
+            onclick="loadDashboard()"
+            style="margin-top:32px;width:auto;padding:13px 32px">
+      Accéder à mon espace →
+    </button>
   </div>
 </div>
 
@@ -1611,7 +1616,13 @@ async function submitTest() {
   try { await document.exitFullscreen(); } catch { /* ignore si déjà quitté */ }
 
   state.candidate.statut = 'soumis';
-  await loadDashboard();
+
+  // Afficher l'écran de résultat QCM avant le dashboard
+  document.getElementById('end-title').textContent = `Test terminé — ${score} / ${NB_QUESTIONS}`;
+  document.getElementById('end-text').innerHTML =
+    `Votre résultat a bien été enregistré.<br><br>Cliquez ci-dessous pour accéder à votre espace et démarrer le One Pager.`;
+  document.getElementById('btn-end-continue').disabled = false;
+  showScreen('screen-end');
 }
 
 // ============================================================
@@ -1729,19 +1740,30 @@ async function loadDashboard() {
     if (rows && rows[0]) Object.assign(state.candidate, rows[0]);
   } catch { /* ignore */ }
 
-  // Load OP assignment (includes all OP tracking fields) + company
+  // Load OP assignment : d'abord l'assignment candidat, sinon le template de session
   try {
-    const assnRows = await sbFetch(
-      `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&select=*`
+    // 1. Assignment propre au candidat courant
+    const candidateAssnRows = await sbFetch(
+      `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&candidate_id=eq.${c.id}&select=*`
     );
-    if (assnRows && assnRows[0]) {
-      state.opAssignment = assnRows[0];
+    if (candidateAssnRows && candidateAssnRows[0]) {
+      state.opAssignment = candidateAssnRows[0];
+    } else {
+      // 2. Template de session (admin l'a créé sans candidate_id)
+      const templateRows = await sbFetch(
+        `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&candidate_id=is.null&select=*`
+      );
+      // Template = company info uniquement, pas de progression
+      state.opAssignment = templateRows?.[0]
+        ? { ...templateRows[0], started_at: null, statut: null, deadline: null }
+        : null;
+    }
+    if (state.opAssignment) {
       const compRows = await sbFetch(
-        `/rest/v1/onepager_companies?id=eq.${assnRows[0].company_id}&actif=eq.true&select=*`
+        `/rest/v1/onepager_companies?id=eq.${state.opAssignment.company_id}&actif=eq.true&select=*`
       );
       state.opCompany = compRows?.[0] || null;
     } else {
-      state.opAssignment = null;
       state.opCompany = null;
     }
   } catch { /* ignore */ }
@@ -1845,15 +1867,20 @@ async function startOnePager() {
     const now      = new Date();
     const deadline = new Date(now.getTime() + 45 * 60 * 1000).toISOString();
 
-    await sbFetch(`/rest/v1/onepager_assignments?id=eq.${state.opAssignment.id}`, {
-      method: 'PATCH',
-      headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({ started_at: now.toISOString(), deadline: deadline, statut: 'en_cours' }),
+    // Créer un assignment propre à ce candidat (le template de session reste intact)
+    const newRows = await sbFetch('/rest/v1/onepager_assignments', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({
+        session_id:   state.opAssignment.session_id,
+        company_id:   state.opAssignment.company_id,
+        candidate_id: state.candidate.id,
+        started_at:   now.toISOString(),
+        deadline:     deadline,
+        statut:       'en_cours',
+      }),
     });
-
-    state.opAssignment.started_at = now.toISOString();
-    state.opAssignment.deadline   = deadline;
-    state.opAssignment.statut     = 'en_cours';
+    state.opAssignment = newRows[0];
     loadOpActiveScreen();
   } catch(e) {
     toast('Erreur au démarrage. Réessayez.', 'error');
