@@ -1606,8 +1606,9 @@ async function submitTest() {
     console.error('Submit error:', e);
   }
 
-  // Désactiver la détection de fraude
+  // Désactiver la détection de fraude et quitter le plein écran
   deactivateFraudDetection();
+  try { await document.exitFullscreen(); } catch { /* ignore si déjà quitté */ }
 
   state.candidate.statut = 'soumis';
   await loadDashboard();
@@ -1773,7 +1774,8 @@ function renderOPCard() {
   const badge = document.getElementById('badge-op');
   const desc  = document.getElementById('op-card-desc');
   const qcmDone = (state.candidate.statut === 'soumis');
-  const opStatut = state.opAssignment?.statut;
+  // Ne lire statut que si le candidat a effectivement démarré le OP (started_at renseigné)
+  const opStatut = state.opAssignment?.started_at ? state.opAssignment?.statut : null;
 
   if (!qcmDone) {
     card.className = 'module-card locked';
@@ -1814,7 +1816,7 @@ function goToQCM() {
 function goToOnePager() {
   if (state.candidate.statut !== 'soumis') return;
   if (!state.opAssignment) return;
-  const op = state.opAssignment?.statut;
+  const op = state.opAssignment?.started_at ? state.opAssignment?.statut : null;
   if (op === 'dans_les_temps' || op === 'hors_delai' || op === 'expire') return;
   if (op === 'en_cours') { loadOpActiveScreen(); return; }
   // Show briefing
