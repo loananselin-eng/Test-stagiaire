@@ -1702,18 +1702,18 @@ async function loadDashboard() {
   document.getElementById('dash-greeting').textContent = `Bonjour ${c.prenom} ${c.nom}`;
   document.getElementById('dash-sub').textContent = `Session : ${state.session.promo || state.session.code}`;
 
-  // Refresh candidate data (op fields)
+  // Refresh QCM statut
   try {
     const rows = await sbFetch(
-      `/rest/v1/candidates?id=eq.${c.id}&select=statut,op_statut,op_deadline,op_started_at,op_submitted_at,op_fichier_url,op_fichier_nom`
+      `/rest/v1/candidates?id=eq.${c.id}&select=statut`
     );
     if (rows && rows[0]) Object.assign(state.candidate, rows[0]);
   } catch { /* ignore */ }
 
-  // Load OP assignment + company
+  // Load OP assignment (includes all OP tracking fields) + company
   try {
     const assnRows = await sbFetch(
-      `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&select=id,session_id,company_id`
+      `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&select=*`
     );
     if (assnRows && assnRows[0]) {
       state.opAssignment = assnRows[0];
@@ -1755,7 +1755,7 @@ function renderOPCard() {
   const badge = document.getElementById('badge-op');
   const desc  = document.getElementById('op-card-desc');
   const qcmDone = (state.candidate.statut === 'soumis');
-  const opStatut = state.candidate.op_statut;
+  const opStatut = state.opAssignment?.statut;
 
   if (!qcmDone) {
     card.className = 'module-card locked';
@@ -1796,7 +1796,7 @@ function goToQCM() {
 function goToOnePager() {
   if (state.candidate.statut !== 'soumis') return;
   if (!state.opAssignment) return;
-  const op = state.candidate.op_statut;
+  const op = state.opAssignment?.statut;
   if (op === 'dans_les_temps' || op === 'hors_delai' || op === 'expire') return;
   if (op === 'en_cours') { loadOpActiveScreen(); return; }
   // Show briefing
@@ -1825,15 +1825,15 @@ async function startOnePager() {
     const now      = new Date();
     const deadline = new Date(now.getTime() + 45 * 60 * 1000).toISOString();
 
-    await sbFetch(`/rest/v1/candidates?id=eq.${state.candidate.id}`, {
+    await sbFetch(`/rest/v1/onepager_assignments?id=eq.${state.opAssignment.id}`, {
       method: 'PATCH',
       headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({ op_started_at: now.toISOString(), op_deadline: deadline, op_statut: 'en_cours' }),
+      body: JSON.stringify({ started_at: now.toISOString(), deadline: deadline, statut: 'en_cours' }),
     });
 
-    state.candidate.op_started_at = now.toISOString();
-    state.candidate.op_deadline   = deadline;
-    state.candidate.op_statut     = 'en_cours';
+    state.opAssignment.started_at = now.toISOString();
+    state.opAssignment.deadline   = deadline;
+    state.opAssignment.statut     = 'en_cours';
     loadOpActiveScreen();
   } catch(e) {
     toast('Erreur au démarrage. Réessayez.', 'error');
@@ -1864,7 +1864,7 @@ function loadOpActiveScreen() {
 
 function startOpTimer() {
   clearInterval(state.opTimerInterval);
-  const deadline = new Date(state.candidate.op_deadline).getTime();
+  const deadline = new Date(state.opAssignment.deadline).getTime();
 
   function tick() {
     const remaining = Math.max(0, deadline - Date.now());
@@ -1883,7 +1883,7 @@ function startOpTimer() {
 }
 
 function handleOpExpiry() {
-  state.candidate.op_statut = 'expire';
+  state.opAssignment.statut = 'expire';
   document.getElementById('btn-submit-op').disabled = true;
 
   if (state.opUploadedUrl) {
@@ -1893,10 +1893,10 @@ function handleOpExpiry() {
   }
 
   // No file — expire without submission
-  sbFetch(`/rest/v1/candidates?id=eq.${state.candidate.id}`, {
+  sbFetch(`/rest/v1/onepager_assignments?id=eq.${state.opAssignment.id}`, {
     method: 'PATCH',
     headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({ op_statut: 'expire' }),
+    body: JSON.stringify({ statut: 'expire' }),
   }).catch(() => {});
 
   toast('Temps écoulé — votre One Pager a expiré.', 'warn');
@@ -1968,7 +1968,7 @@ async function submitOnePager() {
     state.opUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/onepager-files/${path}`;
     state.opUploadedNom = file.name;
 
-    const deadline = new Date(state.candidate.op_deadline).getTime();
+    const deadline = new Date(state.opAssignment.deadline).getTime();
     const statut   = Date.now() <= deadline ? 'dans_les_temps' : 'hors_delai';
     await finalizeOpSubmission(statut);
 
@@ -1983,21 +1983,21 @@ async function submitOnePager() {
 async function finalizeOpSubmission(statut) {
   clearInterval(state.opTimerInterval);
   const submittedAt = new Date().toISOString();
-  const dureeMs     = new Date(submittedAt) - new Date(state.candidate.op_started_at);
+  const dureeMs     = new Date(submittedAt) - new Date(state.opAssignment.started_at);
   const dureeMins   = Math.round(dureeMs / 60000);
 
-  await sbFetch(`/rest/v1/candidates?id=eq.${state.candidate.id}`, {
+  await sbFetch(`/rest/v1/onepager_assignments?id=eq.${state.opAssignment.id}`, {
     method: 'PATCH',
     headers: { Prefer: 'return=minimal' },
     body: JSON.stringify({
-      op_submitted_at: submittedAt,
-      op_statut:       statut,
-      op_fichier_url:  state.opUploadedUrl,
-      op_fichier_nom:  state.opUploadedNom,
+      submitted_at: submittedAt,
+      statut:       statut,
+      fichier_url:  state.opUploadedUrl,
+      fichier_nom:  state.opUploadedNom,
     }),
   });
 
-  state.candidate.op_statut = statut;
+  state.opAssignment.statut = statut;
 
   fetch(API_SEND_EMAIL, {
     method: 'POST',
@@ -2009,7 +2009,7 @@ async function finalizeOpSubmission(statut) {
         nom:            state.candidate.nom,
         email:          state.candidate.email,
         societe:        state.opCompany?.nom,
-        started_at:     state.candidate.op_started_at,
+        started_at:     state.opAssignment.started_at,
         submitted_at:   submittedAt,
         duree_minutes:  dureeMins,
         statut,

@@ -1568,35 +1568,36 @@ async function loadOpResultats() {
   const tbody = document.getElementById('op-resultats-tbody');
   tbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>';
   try {
-    const [candidates, sessions, assignments, societes] = await Promise.all([
-      sbFetch('/rest/v1/candidates?op_statut=not.is.null&select=id,prenom,nom,session_id,op_statut,op_started_at,op_submitted_at,op_fichier_url&order=op_submitted_at.desc.nullslast'),
+    const [assignments, sessions, societes, candidates] = await Promise.all([
+      sbFetch('/rest/v1/onepager_assignments?statut=not.is.null&select=*&order=submitted_at.desc.nullslast'),
       sbFetch('/rest/v1/sessions?select=id,promo,code'),
-      sbFetch('/rest/v1/onepager_assignments?select=session_id,company_id'),
       sbFetch('/rest/v1/onepager_companies?select=id,nom'),
+      sbFetch('/rest/v1/candidates?select=id,prenom,nom,session_id'),
     ]);
     const sessMap = {}; (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
-    const assnMap = {}; (assignments || []).forEach(a => { assnMap[a.session_id] = a.company_id; });
     const compMap = {}; (societes || []).forEach(s => { compMap[s.id] = s.nom; });
+    const candMap = {}; (candidates || []).forEach(c => { candMap[c.session_id] = c; });
 
-    if (!candidates || candidates.length === 0) {
+    if (!assignments || assignments.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun résultat.</td></tr>';
       return;
     }
-    tbody.innerHTML = candidates.map(c => {
-      const societe = compMap[assnMap[c.session_id]] || '—';
-      const duree = c.op_started_at && c.op_submitted_at
-        ? Math.round((new Date(c.op_submitted_at) - new Date(c.op_started_at)) / 60000) + ' min'
+    tbody.innerHTML = assignments.map(a => {
+      const cand = candMap[a.session_id] || {};
+      const societe = compMap[a.company_id] || '—';
+      const duree = a.started_at && a.submitted_at
+        ? Math.round((new Date(a.submitted_at) - new Date(a.started_at)) / 60000) + ' min'
         : '—';
-      const fichierLink = c.op_fichier_url
-        ? `<a href="${c.op_fichier_url}" target="_blank" style="color:var(--blue-light);text-decoration:none">↗ Fichier</a>`
+      const fichierLink = a.fichier_url
+        ? `<a href="${a.fichier_url}" target="_blank" style="color:var(--blue-light);text-decoration:none">↗ Fichier</a>`
         : '—';
       return `<tr>
-        <td><strong style="color:var(--text-primary)">${c.prenom} ${c.nom}</strong></td>
+        <td><strong style="color:var(--text-primary)">${cand.prenom || '—'} ${cand.nom || ''}</strong></td>
         <td>${societe}</td>
-        <td>${fmtDate(c.op_started_at)}</td>
-        <td>${fmtDate(c.op_submitted_at)}</td>
+        <td>${fmtDate(a.started_at)}</td>
+        <td>${fmtDate(a.submitted_at)}</td>
         <td>${duree}</td>
-        <td>${opBadge(c.op_statut)}</td>
+        <td>${opBadge(a.statut)}</td>
         <td>${fichierLink}</td>
       </tr>`;
     }).join('');
