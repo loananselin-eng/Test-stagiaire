@@ -45,6 +45,8 @@ export default async function handler(req) {
       await sendSubmissionEmails({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL });
     } else if (type === 'fraud_alert') {
       await sendFraudAlert({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL });
+    } else if (type === 'onepager_submission') {
+      await sendOnePagerEmails({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL });
     } else {
       return json({ error: 'Unknown type' }, 400);
     }
@@ -164,6 +166,87 @@ async function sendFraudAlert({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL })
     subject: `🚨 [QCM AUDUN] Alerte fraude — ${prenom} ${nom}`,
     html,
   });
+}
+
+// ============================================================
+// One Pager submission : email admin + email candidat
+// ============================================================
+async function sendOnePagerEmails({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL }) {
+  const {
+    prenom, nom, email,
+    societe,
+    started_at,
+    submitted_at,
+    duree_minutes,
+    statut,          // 'dans_les_temps' | 'hors_delai' | 'expire'
+    fichier_url,
+  } = data;
+
+  const statutLabel = statut === 'dans_les_temps'
+    ? 'Soumis dans les temps ✅'
+    : statut === 'hors_delai'
+      ? 'Soumis hors délai ⚠️'
+      : 'Expiré sans soumission ❌';
+
+  const fmtDate = (iso) => iso ? new Date(iso).toLocaleString('fr-FR') : '—';
+
+  // Email admin
+  const adminHtml = `
+    <div style="font-family:Inter,Arial,sans-serif;color:#1e293b;max-width:600px">
+      <h2 style="color:#0a1628">One Pager soumis — ${prenom} ${nom}</h2>
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:8px 0;color:#64748b;width:160px">Candidat</td>
+            <td style="padding:8px 0"><strong>${prenom} ${nom}</strong> &lt;${email}&gt;</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Société assignée</td>
+            <td style="padding:8px 0"><strong>${societe || '—'}</strong></td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Démarré à</td>
+            <td style="padding:8px 0">${fmtDate(started_at)}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Soumis à</td>
+            <td style="padding:8px 0">${fmtDate(submitted_at)}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Durée utilisée</td>
+            <td style="padding:8px 0">${duree_minutes || '—'} minutes</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Statut</td>
+            <td style="padding:8px 0">${statutLabel}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Fichier</td>
+            <td style="padding:8px 0">${fichier_url
+              ? `<a href="${fichier_url}" style="color:#0a1628">${fichier_url}</a>`
+              : '—'}</td></tr>
+      </table>
+    </div>`;
+
+  // Email candidat
+  const candidatHtml = `
+    <div style="font-family:Inter,Arial,sans-serif;color:#1e293b;max-width:600px">
+      <img src="https://audun-partners.com/logo.png" alt="AUDUN Partners"
+           style="height:40px;margin-bottom:24px" onerror="this.style.display='none'">
+      <p>Bonjour ${prenom},</p>
+      <p>Nous confirmons la bonne réception de votre one pager pour la société <strong>${societe || '—'}</strong>.</p>
+      <p>L'équipe AUDUN Partners reviendra vers vous prochainement.</p>
+      <br>
+      <p>Cordialement,<br><strong>L'équipe AUDUN Partners</strong></p>
+    </div>`;
+
+  const promises = [
+    resendSend({
+      api_key: RESEND_API_KEY,
+      from: `AUDUN Partners <${FROM_EMAIL}>`,
+      to: [ADMIN_EMAIL],
+      subject: `[AUDUN] One Pager soumis — ${prenom} ${nom}`,
+      html: adminHtml,
+    }),
+  ];
+
+  if (email) {
+    promises.push(resendSend({
+      api_key: RESEND_API_KEY,
+      from: `AUDUN Partners <${FROM_EMAIL}>`,
+      to: [email],
+      subject: 'AUDUN Partners — Confirmation de réception de votre one pager',
+      html: candidatHtml,
+    }));
+  }
+
+  await Promise.all(promises);
 }
 
 // ============================================================

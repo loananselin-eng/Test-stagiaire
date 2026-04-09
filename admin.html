@@ -401,6 +401,26 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .loading-row td { text-align: center; color: var(--text-muted); padding: 40px; }
+
+    /* Sub-tabs (One Pager) */
+    .subtab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .subtab-btn {
+      background: transparent; border: none;
+      color: var(--text-muted); font-family: inherit;
+      font-size: 13px; font-weight: 500;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 200ms ease;
+    }
+    .subtab-btn:hover { color: var(--text-secondary); }
+    .subtab-btn.active { color: var(--blue-primary); border-bottom-color: var(--blue-primary); }
+    .subtab-content { display: none; }
+    .subtab-content.active { display: block; }
   </style>
 </head>
 <body>
@@ -451,6 +471,7 @@
     <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
     <button class="tab-btn" onclick="switchTab('questions')">Questions</button>
     <button class="tab-btn" onclick="switchTab('sessions')">Sessions</button>
+    <button class="tab-btn" onclick="switchTab('onepager')">One Pager</button>
     <button class="tab-btn" onclick="switchTab('parametres')">Paramètres</button>
   </nav>
 
@@ -560,6 +581,81 @@
             <tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB: ONE PAGER
+  ============================================================ -->
+  <div id="tab-onepager" class="tab-content">
+    <div class="subtab-bar">
+      <button class="subtab-btn active" onclick="switchSubTab('societes', this)">Sociétés</button>
+      <button class="subtab-btn" onclick="switchSubTab('assignments', this)">Assignments</button>
+      <button class="subtab-btn" onclick="switchSubTab('resultats', this)">Résultats</button>
+    </div>
+
+    <!-- Sociétés -->
+    <div id="subtab-societes" class="subtab-content active">
+      <div class="section-header">
+        <div><h2>Sociétés</h2><p>Bibliothèque de sociétés pour les one pagers</p></div>
+        <button class="btn-primary" onclick="openCompanyModal()">+ Nouvelle société</button>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nom</th><th>Secteur</th><th>Actif</th><th>Actions</th></tr></thead>
+            <tbody id="societes-tbody">
+              <tr class="loading-row"><td colspan="4"><span class="spinner"></span>Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assignments -->
+    <div id="subtab-assignments" class="subtab-content">
+      <div class="section-header">
+        <div><h2>Assignments</h2><p>Associe une société à une session de test</p></div>
+        <button class="btn-primary" onclick="openAssignmentModal()">+ Nouvel assignment</button>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Session</th><th>Société</th><th>Actions</th></tr></thead>
+            <tbody id="assignments-tbody">
+              <tr class="loading-row"><td colspan="3"><span class="spinner"></span>Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Résultats -->
+    <div id="subtab-resultats" class="subtab-content">
+      <div class="section-header">
+        <div><h2>Résultats One Pager</h2><p>Soumissions des candidats</p></div>
+        <button class="btn-secondary" onclick="loadOpResultats()">↻ Actualiser</button>
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Candidat</th>
+                <th>Société</th>
+                <th>Démarré</th>
+                <th>Soumis</th>
+                <th>Durée</th>
+                <th>Statut</th>
+                <th>Fichier</th>
+              </tr>
+            </thead>
+            <tbody id="op-resultats-tbody">
+              <tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -715,6 +811,54 @@
 </div>
 
 <!-- ============================================================
+     MODAL — Société One Pager
+============================================================ -->
+<div id="modal-op-company" class="modal-overlay">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-header">
+      <h3 id="modal-comp-title">Nouvelle société</h3>
+      <button class="modal-close" onclick="closeModal('modal-op-company')">&times;</button>
+    </div>
+    <form onsubmit="saveOpCompany(event)">
+      <input type="hidden" id="comp-id">
+      <label>Nom *</label>
+      <input type="text" id="comp-nom" required placeholder="Ex : Schneider Electric">
+      <label>Secteur</label>
+      <input type="text" id="comp-secteur" placeholder="Ex : Industrie, Tech, Santé…">
+      <label>Description / instructions complémentaires</label>
+      <textarea id="comp-description" rows="4"
+                placeholder="Optionnel — contexte, données clés, focus attendu pour le one pager"></textarea>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modal-op-company')">Annuler</button>
+        <button type="submit" class="btn-primary" id="btn-save-comp">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL — Assignment One Pager
+============================================================ -->
+<div id="modal-op-assignment" class="modal-overlay">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <h3>Nouvel assignment</h3>
+      <button class="modal-close" onclick="closeModal('modal-op-assignment')">&times;</button>
+    </div>
+    <form onsubmit="saveOpAssignment(event)">
+      <label>Session *</label>
+      <select id="assign-session" required></select>
+      <label>Société *</label>
+      <select id="assign-company" required></select>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeModal('modal-op-assignment')">Annuler</button>
+        <button type="submit" class="btn-primary">Créer l'assignment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
 <script>
@@ -806,8 +950,9 @@ function switchTab(name) {
   event.target.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
 
-  if (name === 'questions') loadQuestions();
-  if (name === 'sessions')  loadSessions();
+  if (name === 'questions')  loadQuestions();
+  if (name === 'sessions')   loadSessions();
+  if (name === 'onepager')   loadOpTab();
 }
 
 // ============================================================
@@ -1237,6 +1382,235 @@ async function toggleSession(sId, active) {
   } catch (err) {
     alert('Erreur : ' + err.message);
   }
+}
+
+// ============================================================
+// TAB: ONE PAGER
+// ============================================================
+let allSocietes    = [];
+let allAssignments = [];
+
+function loadOpTab() {
+  document.querySelectorAll('#tab-onepager .subtab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+  document.querySelectorAll('#tab-onepager .subtab-content').forEach((c, i) => c.classList.toggle('active', i === 0));
+  loadOpSocietes();
+}
+
+function switchSubTab(name, btn) {
+  document.querySelectorAll('#tab-onepager .subtab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#tab-onepager .subtab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('subtab-' + name).classList.add('active');
+  if (name === 'societes')    loadOpSocietes();
+  if (name === 'assignments') loadOpAssignments();
+  if (name === 'resultats')   loadOpResultats();
+}
+
+async function loadOpSocietes() {
+  const tbody = document.getElementById('societes-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="4"><span class="spinner"></span>Chargement…</td></tr>';
+  try {
+    allSocietes = await sbFetch('/rest/v1/op_companies?select=*&order=nom.asc') || [];
+    if (allSocietes.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Aucune société. Créez-en une !</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allSocietes.map(s => `
+      <tr>
+        <td style="color:var(--text-primary);font-weight:500">${s.nom}</td>
+        <td>${s.secteur || '—'}</td>
+        <td>
+          <label class="toggle">
+            <input type="checkbox" ${s.actif ? 'checked' : ''}
+                   onchange="toggleOpCompany('${s.id}', this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </td>
+        <td style="display:flex;gap:8px">
+          <button class="btn-secondary btn-sm" onclick="openCompanyModal('${s.id}')">Éditer</button>
+          <button class="btn-danger btn-sm" onclick="deleteOpCompany('${s.id}')">Supprimer</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--danger);padding:24px">${e.message}</td></tr>`;
+  }
+}
+
+function openCompanyModal(compId) {
+  ['comp-id','comp-nom','comp-secteur','comp-description'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('modal-comp-title').textContent = 'Nouvelle société';
+  if (compId) {
+    const s = allSocietes.find(x => x.id === compId);
+    if (s) {
+      document.getElementById('modal-comp-title').textContent = 'Modifier la société';
+      document.getElementById('comp-id').value          = s.id;
+      document.getElementById('comp-nom').value         = s.nom || '';
+      document.getElementById('comp-secteur').value     = s.secteur || '';
+      document.getElementById('comp-description').value = s.description || '';
+    }
+  }
+  document.getElementById('modal-op-company').classList.add('open');
+}
+
+async function saveOpCompany(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-save-comp');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Enregistrement…';
+  const compId = document.getElementById('comp-id').value;
+  const payload = {
+    nom:         document.getElementById('comp-nom').value.trim(),
+    secteur:     document.getElementById('comp-secteur').value.trim() || null,
+    description: document.getElementById('comp-description').value.trim() || null,
+    actif:       true,
+  };
+  try {
+    if (compId) {
+      await sbFetch(`/rest/v1/op_companies?id=eq.${compId}`, {
+        method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(payload),
+      });
+    } else {
+      await sbFetch('/rest/v1/op_companies', { method: 'POST', body: JSON.stringify(payload) });
+    }
+    closeModal('modal-op-company');
+    loadOpSocietes();
+  } catch(err) { alert('Erreur : ' + err.message); }
+  finally { btn.disabled = false; btn.textContent = 'Enregistrer'; }
+}
+
+async function toggleOpCompany(compId, active) {
+  try {
+    await sbFetch(`/rest/v1/op_companies?id=eq.${compId}`, {
+      method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ actif: active }),
+    });
+    const s = allSocietes.find(x => x.id === compId);
+    if (s) s.actif = active;
+  } catch(err) { alert('Erreur : ' + err.message); }
+}
+
+async function deleteOpCompany(compId) {
+  if (!confirm('Supprimer cette société ? Cette action est irréversible.')) return;
+  try {
+    await sbFetch(`/rest/v1/op_companies?id=eq.${compId}`, { method: 'DELETE' });
+    loadOpSocietes();
+  } catch(err) { alert('Erreur : ' + err.message); }
+}
+
+async function loadOpAssignments() {
+  const tbody = document.getElementById('assignments-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="3"><span class="spinner"></span>Chargement…</td></tr>';
+  try {
+    const [assigns, sessions, societes] = await Promise.all([
+      sbFetch('/rest/v1/op_assignments?select=*&order=created_at.desc'),
+      sbFetch('/rest/v1/sessions?select=id,promo,code'),
+      sbFetch('/rest/v1/op_companies?select=id,nom'),
+    ]);
+    const sessMap = {}; (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
+    const compMap = {}; (societes || []).forEach(s => { compMap[s.id] = s.nom; });
+    allAssignments = assigns || [];
+    if (allAssignments.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="empty-state">Aucun assignment.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allAssignments.map(a => `
+      <tr>
+        <td>${sessMap[a.session_id] || '—'}</td>
+        <td>${compMap[a.company_id] || '—'}</td>
+        <td>
+          <button class="btn-danger btn-sm" onclick="deleteOpAssignment('${a.id}')">Supprimer</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--danger);padding:24px">${e.message}</td></tr>`;
+  }
+}
+
+async function openAssignmentModal() {
+  const [sessions, societes] = await Promise.all([
+    sbFetch('/rest/v1/sessions?select=id,promo,code&actif=eq.true'),
+    sbFetch('/rest/v1/op_companies?select=id,nom&actif=eq.true'),
+  ]);
+  document.getElementById('assign-session').innerHTML =
+    '<option value="">— Sélectionner —</option>' +
+    (sessions || []).map(s => `<option value="${s.id}">${s.promo || s.code}</option>`).join('');
+  document.getElementById('assign-company').innerHTML =
+    '<option value="">— Sélectionner —</option>' +
+    (societes || []).map(s => `<option value="${s.id}">${s.nom}</option>`).join('');
+  document.getElementById('modal-op-assignment').classList.add('open');
+}
+
+async function saveOpAssignment(e) {
+  e.preventDefault();
+  const sessionId = document.getElementById('assign-session').value;
+  const companyId = document.getElementById('assign-company').value;
+  if (!sessionId || !companyId) return;
+  try {
+    await sbFetch('/rest/v1/op_assignments', {
+      method: 'POST',
+      body: JSON.stringify({ session_id: sessionId, company_id: companyId }),
+    });
+    closeModal('modal-op-assignment');
+    loadOpAssignments();
+  } catch(err) { alert('Erreur : ' + err.message); }
+}
+
+async function deleteOpAssignment(assnId) {
+  if (!confirm('Supprimer cet assignment ?')) return;
+  try {
+    await sbFetch(`/rest/v1/op_assignments?id=eq.${assnId}`, { method: 'DELETE' });
+    loadOpAssignments();
+  } catch(err) { alert('Erreur : ' + err.message); }
+}
+
+async function loadOpResultats() {
+  const tbody = document.getElementById('op-resultats-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>';
+  try {
+    const [candidates, sessions, assignments, societes] = await Promise.all([
+      sbFetch('/rest/v1/candidates?op_statut=not.is.null&select=id,prenom,nom,session_id,op_statut,op_started_at,op_submitted_at,op_fichier_url&order=op_submitted_at.desc.nullslast'),
+      sbFetch('/rest/v1/sessions?select=id,promo,code'),
+      sbFetch('/rest/v1/op_assignments?select=session_id,company_id'),
+      sbFetch('/rest/v1/op_companies?select=id,nom'),
+    ]);
+    const sessMap = {}; (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
+    const assnMap = {}; (assignments || []).forEach(a => { assnMap[a.session_id] = a.company_id; });
+    const compMap = {}; (societes || []).forEach(s => { compMap[s.id] = s.nom; });
+
+    if (!candidates || candidates.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun résultat.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = candidates.map(c => {
+      const societe = compMap[assnMap[c.session_id]] || '—';
+      const duree = c.op_started_at && c.op_submitted_at
+        ? Math.round((new Date(c.op_submitted_at) - new Date(c.op_started_at)) / 60000) + ' min'
+        : '—';
+      const fichierLink = c.op_fichier_url
+        ? `<a href="${c.op_fichier_url}" target="_blank" style="color:var(--blue-light);text-decoration:none">↗ Fichier</a>`
+        : '—';
+      return `<tr>
+        <td><strong style="color:var(--text-primary)">${c.prenom} ${c.nom}</strong></td>
+        <td>${societe}</td>
+        <td>${fmtDate(c.op_started_at)}</td>
+        <td>${fmtDate(c.op_submitted_at)}</td>
+        <td>${duree}</td>
+        <td>${opBadge(c.op_statut)}</td>
+        <td>${fichierLink}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:24px">${e.message}</td></tr>`;
+  }
+}
+
+function opBadge(statut) {
+  if (statut === 'dans_les_temps') return '<span class="badge badge-ok">Dans les temps</span>';
+  if (statut === 'hors_delai')     return '<span class="badge badge-suspicion">Hors délai</span>';
+  if (statut === 'expire')         return '<span class="badge badge-alerte">Expiré</span>';
+  if (statut === 'en_cours')       return '<span class="badge badge-encours">En cours</span>';
+  return '<span class="badge" style="background:rgba(148,163,184,0.15);color:var(--text-muted)">—</span>';
 }
 
 // ============================================================
