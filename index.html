@@ -1713,12 +1713,12 @@ async function loadDashboard() {
   // Load OP assignment + company
   try {
     const assnRows = await sbFetch(
-      `/rest/v1/op_assignments?session_id=eq.${c.session_id}&select=id,session_id,company_id`
+      `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&select=id,session_id,company_id`
     );
     if (assnRows && assnRows[0]) {
       state.opAssignment = assnRows[0];
       const compRows = await sbFetch(
-        `/rest/v1/op_companies?id=eq.${assnRows[0].company_id}&actif=eq.true&select=*`
+        `/rest/v1/onepager_companies?id=eq.${assnRows[0].company_id}&actif=eq.true&select=*`
       );
       state.opCompany = compRows?.[0] || null;
     } else {

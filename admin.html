@@ -1410,7 +1410,7 @@ async function loadOpSocietes() {
   const tbody = document.getElementById('societes-tbody');
   tbody.innerHTML = '<tr class="loading-row"><td colspan="4"><span class="spinner"></span>Chargement…</td></tr>';
   try {
-    allSocietes = await sbFetch('/rest/v1/op_companies?select=*&order=nom.asc') || [];
+    allSocietes = await sbFetch('/rest/v1/onepager_companies?select=*&order=nom.asc') || [];
     if (allSocietes.length === 0) {
       tbody.innerHTML = '<tr><td colspan="4" class="empty-state">Aucune société. Créez-en une !</td></tr>';
       return;
@@ -1468,11 +1468,11 @@ async function saveOpCompany(e) {
   };
   try {
     if (compId) {
-      await sbFetch(`/rest/v1/op_companies?id=eq.${compId}`, {
+      await sbFetch(`/rest/v1/onepager_companies?id=eq.${compId}`, {
         method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify(payload),
       });
     } else {
-      await sbFetch('/rest/v1/op_companies', { method: 'POST', body: JSON.stringify(payload) });
+      await sbFetch('/rest/v1/onepager_companies', { method: 'POST', body: JSON.stringify(payload) });
     }
     closeModal('modal-op-company');
     loadOpSocietes();
@@ -1482,7 +1482,7 @@ async function saveOpCompany(e) {
 
 async function toggleOpCompany(compId, active) {
   try {
-    await sbFetch(`/rest/v1/op_companies?id=eq.${compId}`, {
+    await sbFetch(`/rest/v1/onepager_companies?id=eq.${compId}`, {
       method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ actif: active }),
     });
     const s = allSocietes.find(x => x.id === compId);
@@ -1493,7 +1493,7 @@ async function toggleOpCompany(compId, active) {
 async function deleteOpCompany(compId) {
   if (!confirm('Supprimer cette société ? Cette action est irréversible.')) return;
   try {
-    await sbFetch(`/rest/v1/op_companies?id=eq.${compId}`, { method: 'DELETE' });
+    await sbFetch(`/rest/v1/onepager_companies?id=eq.${compId}`, { method: 'DELETE' });
     loadOpSocietes();
   } catch(err) { alert('Erreur : ' + err.message); }
 }
@@ -1503,9 +1503,9 @@ async function loadOpAssignments() {
   tbody.innerHTML = '<tr class="loading-row"><td colspan="3"><span class="spinner"></span>Chargement…</td></tr>';
   try {
     const [assigns, sessions, societes] = await Promise.all([
-      sbFetch('/rest/v1/op_assignments?select=*&order=created_at.desc'),
+      sbFetch('/rest/v1/onepager_assignments?select=*&order=created_at.desc'),
       sbFetch('/rest/v1/sessions?select=id,promo,code'),
-      sbFetch('/rest/v1/op_companies?select=id,nom'),
+      sbFetch('/rest/v1/onepager_companies?select=id,nom'),
     ]);
     const sessMap = {}; (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
     const compMap = {}; (societes || []).forEach(s => { compMap[s.id] = s.nom; });
@@ -1530,7 +1530,7 @@ async function loadOpAssignments() {
 async function openAssignmentModal() {
   const [sessions, societes] = await Promise.all([
     sbFetch('/rest/v1/sessions?select=id,promo,code&actif=eq.true'),
-    sbFetch('/rest/v1/op_companies?select=id,nom&actif=eq.true'),
+    sbFetch('/rest/v1/onepager_companies?select=id,nom&actif=eq.true'),
   ]);
   document.getElementById('assign-session').innerHTML =
     '<option value="">— Sélectionner —</option>' +
@@ -1547,7 +1547,7 @@ async function saveOpAssignment(e) {
   const companyId = document.getElementById('assign-company').value;
   if (!sessionId || !companyId) return;
   try {
-    await sbFetch('/rest/v1/op_assignments', {
+    await sbFetch('/rest/v1/onepager_assignments', {
       method: 'POST',
       body: JSON.stringify({ session_id: sessionId, company_id: companyId }),
     });
@@ -1559,7 +1559,7 @@ async function saveOpAssignment(e) {
 async function deleteOpAssignment(assnId) {
   if (!confirm('Supprimer cet assignment ?')) return;
   try {
-    await sbFetch(`/rest/v1/op_assignments?id=eq.${assnId}`, { method: 'DELETE' });
+    await sbFetch(`/rest/v1/onepager_assignments?id=eq.${assnId}`, { method: 'DELETE' });
     loadOpAssignments();
   } catch(err) { alert('Erreur : ' + err.message); }
 }
@@ -1571,8 +1571,8 @@ async function loadOpResultats() {
     const [candidates, sessions, assignments, societes] = await Promise.all([
       sbFetch('/rest/v1/candidates?op_statut=not.is.null&select=id,prenom,nom,session_id,op_statut,op_started_at,op_submitted_at,op_fichier_url&order=op_submitted_at.desc.nullslast'),
       sbFetch('/rest/v1/sessions?select=id,promo,code'),
-      sbFetch('/rest/v1/op_assignments?select=session_id,company_id'),
-      sbFetch('/rest/v1/op_companies?select=id,nom'),
+      sbFetch('/rest/v1/onepager_assignments?select=session_id,company_id'),
+      sbFetch('/rest/v1/onepager_companies?select=id,nom'),
     ]);
     const sessMap = {}; (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
     const assnMap = {}; (assignments || []).forEach(a => { assnMap[a.session_id] = a.company_id; });
