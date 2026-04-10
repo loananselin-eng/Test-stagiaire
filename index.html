@@ -799,6 +799,7 @@ let state = {
   selectedOption: null,
   fraudEventCount: 0,
   fraudListeners: [],
+  isResuming: false,      // true quand l'utilisateur reprend un test en cours
 };
 
 // ============================================================
@@ -925,6 +926,7 @@ async function commencer() {
       questionIds  = cand.questions_tirees;
       state.reponses = cand.reponses || {};
       state.candidate = { id: candidateId, nom, prenom, email, session_id: state.session.id };
+      state.isResuming = true;
     } else {
       // Tirer 20 questions aléatoires
       const allQ = await sbFetch(
@@ -960,7 +962,22 @@ async function commencer() {
     qs.forEach(q => { qMap[q.id] = q; });
     state.questions = questionIds.map(id => qMap[id]).filter(Boolean);
 
-    showScreen('screen-briefing');
+    if (state.isResuming) {
+      // Reprise directe sans repasser par le briefing
+      toast('Reprise de votre session en cours…', '');
+      try { await document.documentElement.requestFullscreen(); } catch {}
+      activateFraudDetection();
+      showScreen('screen-test');
+      const resumeIndex = state.questions.findIndex(q => !(q.id in state.reponses));
+      if (resumeIndex === -1) {
+        // Toutes les questions ont une réponse mais la soumission avait échoué
+        submitTest();
+      } else {
+        loadQuestion(resumeIndex);
+      }
+    } else {
+      showScreen('screen-briefing');
+    }
 
   } catch (e) {
     console.error(e);
@@ -995,9 +1012,8 @@ async function startTest() {
   activateFraudDetection();
 
   showScreen('screen-test');
-  // Reprendre à la première question sans réponse (ou 0 pour un nouveau test)
-  const resumeIndex = state.questions.findIndex(q => !(q.id in state.reponses));
-  loadQuestion(resumeIndex >= 0 ? resumeIndex : 0);
+  // Nouveau test : toujours partir de la question 0 (reponses est vide)
+  loadQuestion(0);
 }
 
 // ============================================================
