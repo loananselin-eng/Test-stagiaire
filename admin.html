@@ -771,6 +771,11 @@
           <label>Thème</label>
           <input type="text" id="q-theme" placeholder="Ex : LBO, Valorisation…">
         </div>
+        <div>
+          <label>Temps spécifique (s)</label>
+          <input type="number" id="q-temps" min="5" max="300"
+                 placeholder="Laisser vide = défaut de session">
+        </div>
         <div class="full">
           <label>Explication (affichée aux admins)</label>
           <textarea id="q-explication" rows="3" placeholder="Optionnel — correction interne"></textarea>
@@ -1201,7 +1206,7 @@ function openQuestionModal(qId) {
   // Reset
   ['q-id','q-enonce','q-contexte','q-option-a','q-option-b',
    'q-option-c','q-option-d','q-bonne-reponse','q-difficulte',
-   'q-theme','q-explication'].forEach(id => {
+   'q-theme','q-temps','q-explication'].forEach(id => {
     const el = document.getElementById(id);
     el.value = '';
   });
@@ -1220,6 +1225,7 @@ function openQuestionModal(qId) {
       document.getElementById('q-bonne-reponse').value = q.bonne_reponse || '';
       document.getElementById('q-difficulte').value   = q.difficulte || '';
       document.getElementById('q-theme').value        = q.theme || '';
+      document.getElementById('q-temps').value        = q.temps || '';
       document.getElementById('q-explication').value  = q.explication || '';
     }
   } else {
@@ -1246,6 +1252,7 @@ async function saveQuestion(e) {
     bonne_reponse: document.getElementById('q-bonne-reponse').value,
     difficulte:    document.getElementById('q-difficulte').value || null,
     theme:         document.getElementById('q-theme').value.trim() || null,
+    temps:         parseInt(document.getElementById('q-temps').value) || null,
     explication:   document.getElementById('q-explication').value.trim() || null,
     actif:         true,
   };

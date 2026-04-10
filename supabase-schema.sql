@@ -31,6 +31,7 @@ create table if not exists questions (
   explication     text,
   difficulte      text,
   theme           text,
+  temps           int,                   -- temps spécifique en secondes (null = défaut de session)
   actif           boolean default true,
   created_at      timestamptz default now()
 );
