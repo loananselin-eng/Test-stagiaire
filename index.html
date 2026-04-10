@@ -1621,7 +1621,7 @@ async function submitTest() {
   state.candidate.statut = 'soumis';
 
   // Afficher l'écran de résultat QCM avant le dashboard
-  document.getElementById('end-title').textContent = `Test terminé — ${score} / ${NB_QUESTIONS}`;
+  document.getElementById('end-title').textContent = `Test terminé`;
   document.getElementById('end-text').innerHTML =
     `Votre résultat a bien été enregistré.<br><br>Cliquez ci-dessous pour accéder à votre espace et démarrer le One Pager.`;
   document.getElementById('btn-end-continue').disabled = false;
