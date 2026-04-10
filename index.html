@@ -9,21 +9,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-deep: #050d1a;
-      --bg-dark: #0a1628;
-      --bg-card: rgba(255, 255, 255, 0.04);
-      --bg-card-hover: rgba(255, 255, 255, 0.07);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-accent: rgba(59, 130, 246, 0.4);
-      --blue-primary: #3b82f6;
-      --blue-light: #60a5fa;
-      --blue-glow: rgba(59, 130, 246, 0.15);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --text-muted: #475569;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
+      --bg-deep: #f0f4f8;
+      --bg-dark: #e8eef5;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --border: #e2e8f0;
+      --border-accent: rgba(37, 99, 235, 0.4);
+      --blue-primary: #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow: rgba(37, 99, 235, 0.15);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +31,7 @@
     html, body {
       height: 100%;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-dark) 100%) fixed;
+      background: #f0f4f8;
       color: var(--text-primary);
       overflow-x: hidden;
     }
@@ -100,9 +100,9 @@
     }
 
     .access-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 48px 40px;
       width: 100%;
@@ -154,8 +154,8 @@
     input[type="text"],
     input[type="email"] {
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 0.5px solid var(--border);
+      background: #f8fafc;
+      border: 1px solid var(--border);
       color: var(--text-primary);
       border-radius: 8px;
       padding: 12px 14px;
@@ -221,9 +221,9 @@
     }
 
     .briefing-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 48px 40px;
       width: 100%;
@@ -284,9 +284,8 @@
     .test-header {
       position: sticky;
       top: 0;
-      background: rgba(5, 13, 26, 0.9);
-      backdrop-filter: blur(20px);
-      border-bottom: 0.5px solid var(--border);
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
       padding: 16px 32px;
       display: flex;
       align-items: center;
@@ -362,9 +361,9 @@
     }
     .context-panel.visible { display: block; }
     .context-panel-inner {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 24px;
       max-height: calc(100vh - 180px);
@@ -433,8 +432,8 @@
       display: flex;
       align-items: flex-start;
       gap: 14px;
-      background: var(--bg-card);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px 20px;
       cursor: pointer;
@@ -516,9 +515,9 @@
     }
 
     .end-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 60px 48px;
       width: 100%;
@@ -571,9 +570,9 @@
       position: fixed;
       bottom: 24px;
       right: 24px;
-      background: var(--bg-card);
-      backdrop-filter: blur(20px);
-      border: 0.5px solid var(--border);
+      background: #ffffff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      border: 1px solid var(--border);
       border-radius: 10px;
       padding: 14px 20px;
       font-size: 13px;
@@ -591,6 +590,226 @@
     }
     #toast.toast-warn { border-color: rgba(245, 158, 11, 0.4); }
     #toast.toast-error { border-color: rgba(239, 68, 68, 0.4); }
+
+    /* ============================================================
+       SCREEN — Dashboard
+    ============================================================ */
+    #screen-dashboard {
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px;
+    }
+
+    .dashboard-top {
+      width: 100%;
+      max-width: 860px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .dashboard-greeting {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .dashboard-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      width: 100%;
+      max-width: 860px;
+    }
+    @media (max-width: 600px) {
+      .dashboard-cards { grid-template-columns: 1fr; }
+    }
+
+    .module-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      cursor: pointer;
+      transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+    }
+    .module-card:hover:not(.locked):not(.done) {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+    .module-card.locked { cursor: not-allowed; opacity: 0.55; }
+    .module-card.done   { cursor: default; border-color: rgba(5,150,105,0.3); background: rgba(5,150,105,0.02); }
+
+    .module-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .module-card-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: var(--blue-glow);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .module-card-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .badge-todo     { background: rgba(37,99,235,0.1);  color: var(--blue-primary); }
+    .badge-done     { background: rgba(5,150,105,0.12); color: var(--success); }
+    .badge-locked   { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+    .badge-expired  { background: rgba(220,38,38,0.1);  color: var(--danger); }
+    .badge-progress { background: rgba(217,119,6,0.12); color: var(--warning); }
+
+    .module-card-title  { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+    .module-card-desc   { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .module-card-action { font-size: 13px; font-weight: 600; color: var(--blue-primary); display: flex; align-items: center; gap: 6px; }
+    .module-card.locked .module-card-action,
+    .module-card.done   .module-card-action { display: none; }
+
+    /* ============================================================
+       SCREEN — OP Briefing
+    ============================================================ */
+    #screen-op-briefing {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* ============================================================
+       SCREEN — OP Active
+    ============================================================ */
+    #screen-op-active { flex-direction: column; min-height: 100vh; }
+
+    .op-header {
+      position: sticky; top: 0;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 100;
+    }
+    .op-header-title   { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .op-header-company { font-size: 13px; color: var(--text-secondary); }
+    .op-timer-box { display: flex; align-items: center; gap: 10px; }
+    .op-timer-display {
+      font-size: 24px; font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      min-width: 76px; text-align: right;
+    }
+    .op-timer-display.urgent { color: var(--danger); }
+
+    .op-body {
+      flex: 1;
+      max-width: 760px; width: 100%;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+    .op-section-title {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .op-instructions {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      font-size: 14px; line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      white-space: pre-line;
+    }
+
+    .op-upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 200ms ease, background 200ms ease;
+      margin-bottom: 16px;
+    }
+    .op-upload-zone:hover, .op-upload-zone.dragover {
+      border-color: var(--blue-primary);
+      background: rgba(37,99,235,0.04);
+    }
+    .op-upload-icon  { font-size: 36px; margin-bottom: 12px; }
+    .op-upload-label { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .op-upload-sub   { font-size: 13px; color: var(--text-muted); }
+
+    .op-file-preview {
+      background: rgba(5,150,105,0.08);
+      border: 1px solid rgba(5,150,105,0.25);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px;
+      font-size: 14px; color: var(--success);
+      margin-bottom: 24px;
+    }
+    .op-file-preview.hidden { display: none; }
+    .op-file-name   { font-weight: 600; flex: 1; }
+    .op-file-remove { font-size: 12px; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
+
+    /* ============================================================
+       SCREEN — OP End
+    ============================================================ */
+    #screen-op-end {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* ============================================================
+       Modal confirmation
+    ============================================================ */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 2000;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 40px 36px;
+      max-width: 460px; width: 90%;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+    }
+    .modal-box h3   { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .modal-box p    { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+    .modal-actions  { display: flex; gap: 12px; justify-content: flex-end; }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      transition: background 200ms ease;
+    }
+    .btn-secondary:hover { background: var(--bg-card-hover); }
   </style>
 </head>
 <body>
@@ -612,7 +831,7 @@
 <div id="screen-access" class="screen active">
   <div class="access-card">
     <div class="logo-wrapper">
-      <img src="logo.png" alt="AUDUN Partners"
+      <img src="logo.svg" alt="AUDUN Partners"
            onerror="this.style.display='none';document.getElementById('logo-text-1').style.display='block'">
       <div id="logo-text-1" style="display:none">
         <div class="logo-fallback">AUDUN Partners</div>
@@ -707,7 +926,7 @@ Toute suspicion de fraude entraîne la disqualification immédiate de votre cand
   <!-- Header -->
   <header class="test-header">
     <div class="header-logo">
-      <img src="logo.png" alt="AUDUN Partners"
+      <img src="logo.svg" alt="AUDUN Partners"
            onerror="this.style.display='none';document.getElementById('header-logo-text').style.display='block'">
       <div id="header-logo-text" class="header-logo-text" style="display:none">AUDUN</div>
     </div>
@@ -761,13 +980,195 @@ Toute suspicion de fraude entraîne la disqualification immédiate de votre cand
 <div id="screen-end" class="screen">
   <div class="end-card">
     <div class="logo-wrapper" style="margin-bottom:24px">
-      <img src="logo.png" alt="AUDUN Partners" style="height:40px;object-fit:contain"
+      <img src="logo.svg" alt="AUDUN Partners" style="height:40px;object-fit:contain"
            onerror="this.style.display='none'">
     </div>
     <div class="end-icon">✓</div>
-    <div class="end-title" id="end-title">Merci, votre test a été enregistré.</div>
+    <div class="end-title" id="end-title">Test terminé</div>
     <div class="end-text" id="end-text">
+      Votre résultat a bien été enregistré.
+    </div>
+    <button class="btn-primary" id="btn-end-continue"
+            onclick="loadDashboard()"
+            style="margin-top:32px;width:auto;padding:13px 32px">
+      Accéder à mon espace →
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN — Dashboard
+============================================================ -->
+<div id="screen-dashboard" class="screen">
+  <div class="dashboard-top">
+    <div>
+      <div class="dashboard-greeting" id="dash-greeting">Bienvenue</div>
+      <div class="dashboard-sub" id="dash-sub">Session : —</div>
+    </div>
+    <img src="logo.svg" alt="AUDUN Partners" style="height:36px;object-fit:contain"
+         onerror="this.style.display='none'">
+  </div>
+  <div class="dashboard-cards">
+    <!-- QCM -->
+    <div class="module-card" id="card-qcm" onclick="goToQCM()">
+      <div class="module-card-header">
+        <div class="module-card-icon">📝</div>
+        <span class="module-card-badge badge-todo" id="badge-qcm">À faire</span>
+      </div>
+      <div class="module-card-title">Test QCM</div>
+      <div class="module-card-desc">20 questions — finance M&amp;A, LBO, évaluation d'entreprise</div>
+      <div class="module-card-action">Commencer →</div>
+    </div>
+    <!-- One Pager -->
+    <div class="module-card locked" id="card-op" onclick="goToOnePager()">
+      <div class="module-card-header">
+        <div class="module-card-icon">📄</div>
+        <span class="module-card-badge badge-locked" id="badge-op">Verrouillé</span>
+      </div>
+      <div class="module-card-title">One Pager</div>
+      <div class="module-card-desc" id="op-card-desc">Disponible après le QCM</div>
+      <div class="module-card-action">Commencer →</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN — OP Briefing
+============================================================ -->
+<div id="screen-op-briefing" class="screen">
+  <div class="briefing-card">
+    <h2>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      One Pager — <span id="op-brief-company">Société</span>
+    </h2>
+
+    <div class="briefing-text">Vous disposez de <strong>45 minutes</strong> pour produire un one pager sur la société qui vous a été assignée.
+
+<strong>Attendus :</strong>
+- Présentation de la société (activité, modèle économique, positionnement)
+- Analyse financière synthétique (croissance, rentabilité, bilan)
+- Positionnement M&amp;A (rationale d'acquisition, valorisation indicative, synergies potentielles)
+
+<strong>Format :</strong>
+- Document PDF ou PowerPoint — 1 à 2 pages maximum
+- Sources libres (sites publics, rapports annuels, presse financière)
+
+Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mis en pause</strong>. Assurez-vous d'être prêt avant de commencer.</div>
+
+    <label class="checkbox-row" for="chk-op-accept">
+      <input type="checkbox" id="chk-op-accept" onchange="toggleOpBriefingBtn()">
+      <span>Je certifie être prêt à commencer et avoir compris les consignes</span>
+    </label>
+
+    <button class="btn-primary" id="btn-start-op" onclick="confirmStartOp()" disabled>
+      Commencer le One Pager
+    </button>
+    <button class="btn-secondary" style="width:100%;margin-top:12px;text-align:center"
+            onclick="showScreen('screen-dashboard')">
+      ← Retour au tableau de bord
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN — OP Active
+============================================================ -->
+<div id="screen-op-active" class="screen">
+  <header class="op-header">
+    <div>
+      <div class="op-header-title">One Pager</div>
+      <div class="op-header-company" id="op-active-company">—</div>
+    </div>
+    <div class="op-timer-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <div class="op-timer-display" id="op-timer-display">45:00</div>
+    </div>
+  </header>
+
+  <div class="op-body">
+    <div id="op-company-info" style="display:none;margin-bottom:32px">
+      <p class="op-section-title">Informations société</p>
+      <div class="op-instructions" id="op-company-description"></div>
+    </div>
+
+    <div id="op-template-block" style="display:none;margin-bottom:24px">
+      <a id="op-template-link" href="#" target="_blank"
+         style="display:inline-flex;align-items:center;gap:8px;
+                background:var(--blue-primary);color:#fff;
+                border-radius:8px;padding:10px 18px;
+                font-size:14px;font-weight:600;text-decoration:none;
+                transition:background 200ms ease;"
+         onmouseover="this.style.background='var(--blue-light)'"
+         onmouseout="this.style.background='var(--blue-primary)'">
+        ↓ Télécharger le template
+      </a>
+    </div>
+
+    <p class="op-section-title">Instructions</p>
+    <div class="op-instructions" id="op-instructions">Chargement…</div>
+
+    <p class="op-section-title">Déposer votre fichier</p>
+    <div class="op-upload-zone" id="op-upload-zone"
+         ondragover="opDragOver(event)" ondragleave="opDragLeave(event)" ondrop="opDrop(event)"
+         onclick="document.getElementById('op-file-input').click()">
+      <div class="op-upload-icon">📎</div>
+      <div class="op-upload-label">Glissez votre fichier ici ou cliquez pour sélectionner</div>
+      <div class="op-upload-sub">PDF ou PowerPoint · max 20 Mo</div>
+    </div>
+    <input type="file" id="op-file-input" accept=".pdf,.ppt,.pptx"
+           style="display:none" onchange="opFileSelected(event)">
+
+    <div class="op-file-preview hidden" id="op-file-preview">
+      <span>📄</span>
+      <span class="op-file-name" id="op-file-name">fichier.pdf</span>
+      <span class="op-file-remove" onclick="opRemoveFile()">Retirer</span>
+    </div>
+
+    <button class="btn-primary" id="btn-submit-op" onclick="submitOnePager()" disabled>
+      Soumettre le One Pager
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN — OP End
+============================================================ -->
+<div id="screen-op-end" class="screen">
+  <div class="end-card">
+    <div class="logo-wrapper" style="margin-bottom:24px">
+      <img src="logo.svg" alt="AUDUN Partners" style="height:40px;object-fit:contain"
+           onerror="this.style.display='none'">
+    </div>
+    <div class="end-icon" id="op-end-icon">📄</div>
+    <div class="end-title" id="op-end-title">One Pager soumis</div>
+    <div class="end-text" id="op-end-text">
+      Votre one pager a bien été enregistré.<br><br>
       L'équipe AUDUN Partners reviendra vers vous prochainement.
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmation OP -->
+<div class="modal-overlay" id="modal-op-confirm">
+  <div class="modal-box">
+    <h3>⏱ Confirmer le démarrage ?</h3>
+    <p>Le chronomètre de <strong>45 minutes</strong> démarrera immédiatement et ne pourra pas être mis en pause. Assurez-vous d'être prêt.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary"
+              onclick="document.getElementById('modal-op-confirm').classList.remove('open')">
+        Annuler
+      </button>
+      <button class="btn-primary" style="width:auto" onclick="startOnePager()">
+        Confirmer
+      </button>
     </div>
   </div>
 </div>
@@ -799,7 +1200,15 @@ let state = {
   selectedOption: null,
   fraudEventCount: 0,
   fraudListeners: [],
-  isResuming: false,      // true quand l'utilisateur reprend un test en cours
+  isResuming: false,      // true si reconnexion en cours de QCM
+  // One Pager
+  opAssignment:   null,   // { id, session_id, company_id }
+  opCompany:      null,   // { id, nom, secteur, description }
+  opTimerInterval: null,
+  opDeadline:     null,
+  opUploadedUrl:  null,
+  opUploadedNom:  null,
+  opFileObj:      null,
 };
 
 // ============================================================
@@ -917,16 +1326,17 @@ async function commencer() {
 
     if (existing && existing.length > 0) {
       const cand = existing[0];
+      candidateId = cand.id;
+      questionIds = cand.questions_tirees;
+      state.reponses = cand.reponses || {};
+      state.candidate = { id: candidateId, nom, prenom, email, session_id: state.session.id, statut: cand.statut };
       if (cand.statut === 'soumis') {
-        document.getElementById('error-already').classList.add('visible');
+        // QCM already done — go straight to dashboard
+        await loadDashboard();
         return;
       }
-      // Reprendre un test en cours — restaurer les réponses déjà enregistrées
-      candidateId  = cand.id;
-      questionIds  = cand.questions_tirees;
-      state.reponses = cand.reponses || {};
-      state.candidate = { id: candidateId, nom, prenom, email, session_id: state.session.id };
-      state.isResuming = true;
+      // Reprendre un test QCM en cours
+      state.isResuming = Object.keys(state.reponses).length > 0;
     } else {
       // Tirer 20 questions aléatoires
       const allQ = await sbFetch(
@@ -950,7 +1360,7 @@ async function commencer() {
         }),
       });
       candidateId = created[0].id;
-      state.candidate = { id: candidateId, nom, prenom, email, session_id: state.session.id };
+      state.candidate = { id: candidateId, nom, prenom, email, session_id: state.session.id, statut: null };
     }
 
     // Charger les questions dans l'ordre du tirage
@@ -962,22 +1372,7 @@ async function commencer() {
     qs.forEach(q => { qMap[q.id] = q; });
     state.questions = questionIds.map(id => qMap[id]).filter(Boolean);
 
-    if (state.isResuming) {
-      // Reprise directe sans repasser par le briefing
-      toast('Reprise de votre session en cours…', '');
-      try { await document.documentElement.requestFullscreen(); } catch {}
-      activateFraudDetection();
-      showScreen('screen-test');
-      const resumeIndex = state.questions.findIndex(q => !(q.id in state.reponses));
-      if (resumeIndex === -1) {
-        // Toutes les questions ont une réponse mais la soumission avait échoué
-        submitTest();
-      } else {
-        loadQuestion(resumeIndex);
-      }
-    } else {
-      showScreen('screen-briefing');
-    }
+    await loadDashboard();
 
   } catch (e) {
     console.error(e);
@@ -1012,7 +1407,6 @@ async function startTest() {
   activateFraudDetection();
 
   showScreen('screen-test');
-  // Nouveau test : toujours partir de la question 0 (reponses est vide)
   loadQuestion(0);
 }
 
@@ -1220,15 +1614,17 @@ async function submitTest() {
     console.error('Submit error:', e);
   }
 
-  // Désactiver la détection de fraude
+  // Désactiver la détection de fraude et quitter le plein écran
   deactivateFraudDetection();
+  try { await document.exitFullscreen(); } catch { /* ignore si déjà quitté */ }
 
-  // Écran fin
-  document.getElementById('end-title').textContent =
-    `Merci ${state.candidate.prenom}.`;
+  state.candidate.statut = 'soumis';
+
+  // Afficher l'écran de résultat QCM avant le dashboard
+  document.getElementById('end-title').textContent = `Test terminé — ${score} / ${NB_QUESTIONS}`;
   document.getElementById('end-text').innerHTML =
-    `Votre test a bien été enregistré.<br><br>L'équipe AUDUN Partners reviendra vers vous prochainement.`;
-
+    `Votre résultat a bien été enregistré.<br><br>Cliquez ci-dessous pour accéder à votre espace et démarrer le One Pager.`;
+  document.getElementById('btn-end-continue').disabled = false;
   showScreen('screen-end');
 }
 
@@ -1328,6 +1724,393 @@ function deactivateFraudDetection() {
   document.removeEventListener('fullscreenchange', onFullscreenChange);
   document.removeEventListener('contextmenu', onContextMenu);
   document.removeEventListener('keydown', onKeyDown);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function loadDashboard() {
+  showScreen('screen-dashboard');
+  const c = state.candidate;
+  document.getElementById('dash-greeting').textContent = `Bonjour ${c.prenom} ${c.nom}`;
+  document.getElementById('dash-sub').textContent = `Session : ${state.session.promo || state.session.code}`;
+
+  // Refresh QCM statut
+  try {
+    const rows = await sbFetch(
+      `/rest/v1/candidates?id=eq.${c.id}&select=statut`
+    );
+    if (rows && rows[0]) Object.assign(state.candidate, rows[0]);
+  } catch { /* ignore */ }
+
+  // Load OP assignment : d'abord l'assignment candidat, sinon le template de session
+  try {
+    // 1. Assignment propre au candidat courant
+    const candidateAssnRows = await sbFetch(
+      `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&candidate_id=eq.${c.id}&select=*`
+    );
+    if (candidateAssnRows && candidateAssnRows[0]) {
+      state.opAssignment = candidateAssnRows[0];
+    } else {
+      // 2. Template de session (admin l'a créé sans candidate_id)
+      const templateRows = await sbFetch(
+        `/rest/v1/onepager_assignments?session_id=eq.${c.session_id}&candidate_id=is.null&select=*`
+      );
+      // Template = company info uniquement, pas de progression
+      state.opAssignment = templateRows?.[0]
+        ? { ...templateRows[0], started_at: null, statut: null, deadline: null }
+        : null;
+    }
+    if (state.opAssignment) {
+      const compRows = await sbFetch(
+        `/rest/v1/onepager_companies?id=eq.${state.opAssignment.company_id}&actif=eq.true&select=*`
+      );
+      state.opCompany = compRows?.[0] || null;
+    } else {
+      state.opCompany = null;
+    }
+  } catch { /* ignore */ }
+
+  renderQCMCard();
+  renderOPCard();
+}
+
+function renderQCMCard() {
+  const card  = document.getElementById('card-qcm');
+  const badge = document.getElementById('badge-qcm');
+  const statut = state.candidate.statut;
+  if (statut === 'soumis') {
+    card.className = 'module-card done';
+    badge.textContent = 'Terminé ✓';
+    badge.className = 'module-card-badge badge-done';
+  } else if (statut === 'en_cours') {
+    card.className = 'module-card';
+    badge.textContent = 'En cours';
+    badge.className = 'module-card-badge badge-progress';
+  } else {
+    card.className = 'module-card';
+    badge.textContent = 'À faire';
+    badge.className = 'module-card-badge badge-todo';
+  }
+}
+
+function renderOPCard() {
+  const card  = document.getElementById('card-op');
+  const badge = document.getElementById('badge-op');
+  const desc  = document.getElementById('op-card-desc');
+  const qcmDone = (state.candidate.statut === 'soumis');
+  // Ne lire statut que si le candidat a effectivement démarré le OP (started_at renseigné)
+  const opStatut = state.opAssignment?.started_at ? state.opAssignment?.statut : null;
+
+  if (!qcmDone) {
+    card.className = 'module-card locked';
+    badge.textContent = 'Verrouillé'; badge.className = 'module-card-badge badge-locked';
+    desc.textContent = 'Disponible après le QCM';
+    return;
+  }
+  if (!state.opAssignment) {
+    card.className = 'module-card locked';
+    badge.textContent = 'Non assigné'; badge.className = 'module-card-badge badge-locked';
+    desc.textContent = 'Aucun exercice assigné à votre session';
+    return;
+  }
+  const societe = state.opCompany?.nom || 'Société assignée';
+  if (opStatut === 'dans_les_temps' || opStatut === 'hors_delai') {
+    card.className = 'module-card done';
+    badge.textContent = 'Soumis ✓'; badge.className = 'module-card-badge badge-done';
+    desc.textContent = `One pager soumis — ${societe}`;
+    return;
+  }
+  if (opStatut === 'expire') {
+    card.className = 'module-card done';
+    badge.textContent = 'Expiré'; badge.className = 'module-card-badge badge-expired';
+    desc.textContent = `Délai expiré — ${societe}`;
+    return;
+  }
+  card.className = 'module-card';
+  badge.textContent = opStatut === 'en_cours' ? 'En cours' : 'À faire';
+  badge.className = 'module-card-badge ' + (opStatut === 'en_cours' ? 'badge-progress' : 'badge-todo');
+  // Ne pas afficher le nom de la société avant le démarrage du One Pager
+  desc.textContent = opStatut === 'en_cours' ? 'En cours — cliquez pour reprendre' : 'Cliquez pour accéder au One Pager';
+}
+
+function goToQCM() {
+  if (state.candidate.statut === 'soumis') return;
+  if (state.isResuming) {
+    // Reprise directe sans passer par le briefing
+    toast('Reprise de votre session en cours…', '');
+    try { document.documentElement.requestFullscreen(); } catch {}
+    activateFraudDetection();
+    showScreen('screen-test');
+    const resumeIndex = state.questions.findIndex(q => !(q.id in state.reponses));
+    if (resumeIndex === -1) { submitTest(); } else { loadQuestion(resumeIndex); }
+    return;
+  }
+  showScreen('screen-briefing');
+}
+
+function goToOnePager() {
+  if (state.candidate.statut !== 'soumis') return;
+  if (!state.opAssignment) return;
+  const op = state.opAssignment?.started_at ? state.opAssignment?.statut : null;
+  if (op === 'dans_les_temps' || op === 'hors_delai' || op === 'expire') return;
+  if (op === 'en_cours') { loadOpActiveScreen(); return; }
+  // Show briefing
+  // Ne pas révéler le nom de la société avant le démarrage effectif
+  document.getElementById('op-brief-company').textContent = 'la société assignée';
+  document.getElementById('chk-op-accept').checked = false;
+  document.getElementById('btn-start-op').disabled = true;
+  showScreen('screen-op-briefing');
+}
+
+function toggleOpBriefingBtn() {
+  document.getElementById('btn-start-op').disabled =
+    !document.getElementById('chk-op-accept').checked;
+}
+
+function confirmStartOp() {
+  document.getElementById('modal-op-confirm').classList.add('open');
+}
+
+async function startOnePager() {
+  document.getElementById('modal-op-confirm').classList.remove('open');
+  const btn = document.getElementById('btn-start-op');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Démarrage…';
+
+  try {
+    const now      = new Date();
+    const deadline = new Date(now.getTime() + 45 * 60 * 1000).toISOString();
+
+    // Créer un assignment propre à ce candidat (le template de session reste intact)
+    const newRows = await sbFetch('/rest/v1/onepager_assignments', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({
+        session_id:   state.opAssignment.session_id,
+        company_id:   state.opAssignment.company_id,
+        candidate_id: state.candidate.id,
+        started_at:   now.toISOString(),
+        deadline:     deadline,
+        statut:       'en_cours',
+      }),
+    });
+    state.opAssignment = newRows[0];
+    loadOpActiveScreen();
+  } catch(e) {
+    toast('Erreur au démarrage. Réessayez.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Commencer le One Pager';
+  }
+}
+
+// ============================================================
+// OP ACTIVE SCREEN
+// ============================================================
+function loadOpActiveScreen() {
+  const societe = state.opCompany?.nom || 'la société assignée';
+  document.getElementById('op-active-company').textContent = societe;
+
+  // Informations société (description)
+  const desc = state.opCompany?.description;
+  const infoBlock = document.getElementById('op-company-info');
+  if (desc && desc.trim()) {
+    document.getElementById('op-company-description').textContent = desc.trim();
+    infoBlock.style.display = '';
+  } else {
+    infoBlock.style.display = 'none';
+  }
+
+  // Template download button
+  const templateUrl = state.opCompany?.template_url;
+  const templateBlock = document.getElementById('op-template-block');
+  const templateLink  = document.getElementById('op-template-link');
+  if (templateUrl && templateUrl.trim()) {
+    templateLink.href = templateUrl.trim();
+    templateBlock.style.display = '';
+  } else {
+    templateBlock.style.display = 'none';
+  }
+
+  document.getElementById('op-instructions').textContent =
+    `Produisez un one pager sur ${societe}.\n\nCouvrez les points suivants :\n• Présentation de la société (activité, modèle économique, positionnement)\n• Analyse financière synthétique (croissance, rentabilité, bilan)\n• Positionnement M&A (rationale d'acquisition, valorisation indicative, synergies)\n\nFormat : PDF ou PowerPoint, 1 à 2 pages, sources libres.\n\nDéposez votre fichier via la zone ci-dessous, puis cliquez sur Soumettre.`;
+
+  // Reset upload zone
+  state.opFileObj = null; state.opUploadedUrl = null; state.opUploadedNom = null;
+  document.getElementById('op-file-preview').classList.add('hidden');
+  document.getElementById('op-upload-zone').style.display = '';
+  document.getElementById('op-file-input').value = '';
+  document.getElementById('btn-submit-op').disabled = true;
+
+  showScreen('screen-op-active');
+  startOpTimer();
+}
+
+function startOpTimer() {
+  clearInterval(state.opTimerInterval);
+  const deadline = new Date(state.opAssignment.deadline).getTime();
+
+  function tick() {
+    const remaining = Math.max(0, deadline - Date.now());
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    const el = document.getElementById('op-timer-display');
+    if (el) {
+      el.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      el.classList.toggle('urgent', mins < 10);
+    }
+    if (remaining <= 0) { clearInterval(state.opTimerInterval); handleOpExpiry(); }
+  }
+
+  tick();
+  state.opTimerInterval = setInterval(tick, 1000);
+}
+
+function handleOpExpiry() {
+  state.opAssignment.statut = 'expire';
+  document.getElementById('btn-submit-op').disabled = true;
+
+  if (state.opUploadedUrl) {
+    // File already uploaded before expiry — submit hors_delai
+    finalizeOpSubmission('hors_delai').catch(() => {});
+    return;
+  }
+
+  // No file — expire without submission
+  sbFetch(`/rest/v1/onepager_assignments?id=eq.${state.opAssignment.id}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ statut: 'expire' }),
+  }).catch(() => {});
+
+  toast('Temps écoulé — votre One Pager a expiré.', 'warn');
+  document.getElementById('op-end-icon').textContent = '⏰';
+  document.getElementById('op-end-title').textContent = 'Temps écoulé';
+  document.getElementById('op-end-text').innerHTML =
+    'Le délai de 45 minutes est dépassé.<br><br>L\'équipe AUDUN Partners a été notifiée.';
+  setTimeout(() => showScreen('screen-op-end'), 2500);
+}
+
+// ============================================================
+// OP FILE UPLOAD
+// ============================================================
+function opDragOver(e)  { e.preventDefault(); document.getElementById('op-upload-zone').classList.add('dragover'); }
+function opDragLeave()  { document.getElementById('op-upload-zone').classList.remove('dragover'); }
+function opDrop(e) {
+  e.preventDefault();
+  document.getElementById('op-upload-zone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processOpFile(file);
+}
+function opFileSelected(e) { const f = e.target.files[0]; if (f) processOpFile(f); }
+function opRemoveFile() {
+  state.opFileObj = null;
+  document.getElementById('op-file-preview').classList.add('hidden');
+  document.getElementById('op-upload-zone').style.display = '';
+  document.getElementById('op-file-input').value = '';
+  document.getElementById('btn-submit-op').disabled = true;
+}
+function processOpFile(file) {
+  if (!file.name.match(/\.(pdf|ppt|pptx)$/i)) {
+    toast('Format non accepté. Utilisez PDF ou PowerPoint.', 'warn'); return;
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    toast('Fichier trop volumineux (max 20 Mo).', 'warn'); return;
+  }
+  state.opFileObj = file;
+  document.getElementById('op-file-name').textContent = file.name;
+  document.getElementById('op-file-preview').classList.remove('hidden');
+  document.getElementById('op-upload-zone').style.display = 'none';
+  document.getElementById('btn-submit-op').disabled = false;
+}
+
+async function submitOnePager() {
+  const btn = document.getElementById('btn-submit-op');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Envoi en cours…';
+
+  try {
+    const file = state.opFileObj;
+    const ext  = file.name.split('.').pop();
+    const path = `${state.candidate.id}/${Date.now()}.${ext}`;
+
+    const uploadRes = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/onepager-files/${path}`,
+      {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON,
+          'Authorization': 'Bearer ' + SUPABASE_ANON,
+          'Content-Type': file.type || 'application/octet-stream',
+          'x-upsert': 'true',
+        },
+        body: file,
+      }
+    );
+    if (!uploadRes.ok) throw new Error(`Upload ${uploadRes.status}: ${await uploadRes.text()}`);
+
+    state.opUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/onepager-files/${path}`;
+    state.opUploadedNom = file.name;
+
+    const deadline = new Date(state.opAssignment.deadline).getTime();
+    const statut   = Date.now() <= deadline ? 'dans_les_temps' : 'hors_delai';
+    await finalizeOpSubmission(statut);
+
+  } catch(e) {
+    console.error(e);
+    toast('Erreur lors de l\'envoi. Réessayez.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Soumettre le One Pager';
+  }
+}
+
+async function finalizeOpSubmission(statut) {
+  clearInterval(state.opTimerInterval);
+  const submittedAt = new Date().toISOString();
+  const dureeMs     = new Date(submittedAt) - new Date(state.opAssignment.started_at);
+  const dureeMins   = Math.round(dureeMs / 60000);
+
+  await sbFetch(`/rest/v1/onepager_assignments?id=eq.${state.opAssignment.id}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      submitted_at: submittedAt,
+      statut:       statut,
+      fichier_url:  state.opUploadedUrl,
+      fichier_nom:  state.opUploadedNom,
+    }),
+  });
+
+  state.opAssignment.statut = statut;
+
+  fetch(API_SEND_EMAIL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'onepager_submission',
+      data: {
+        prenom:         state.candidate.prenom,
+        nom:            state.candidate.nom,
+        email:          state.candidate.email,
+        societe:        state.opCompany?.nom,
+        started_at:     state.opAssignment.started_at,
+        submitted_at:   submittedAt,
+        duree_minutes:  dureeMins,
+        statut,
+        fichier_url:    state.opUploadedUrl,
+      },
+    }),
+  }).catch(() => {});
+
+  document.getElementById('op-end-icon').textContent = statut === 'dans_les_temps' ? '✓' : '⚠️';
+  document.getElementById('op-end-title').textContent =
+    statut === 'dans_les_temps' ? 'One Pager soumis !' : 'Soumis hors délai';
+  document.getElementById('op-end-text').innerHTML =
+    statut === 'dans_les_temps'
+      ? `Votre one pager pour <strong>${state.opCompany?.nom || 'la société'}</strong> a bien été enregistré.<br><br>L'équipe AUDUN Partners reviendra vers vous prochainement.`
+      : `Votre one pager a été soumis après l'expiration du délai. Il sera examiné par l'équipe AUDUN Partners.`;
+
+  showScreen('screen-op-end');
 }
 </script>
 
