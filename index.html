@@ -2666,20 +2666,20 @@ async function processCiblageFile(file) {
     const ext  = file.name.split('.').pop();
     const path = `submissions/${state.candidate.id}/${Date.now()}.${ext}`;
     const uploadRes = await fetch(
-      `${SUPABASE_URL}/storage/v1/object/Ciblage_files/${path}`,
+      `${SUPABASE_URL}/storage/v1/object/onepager-files/${path}`,
       {
         method: 'POST',
         headers: {
           'apikey': SUPABASE_ANON,
           'Authorization': 'Bearer ' + SUPABASE_ANON,
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Type': file.type || 'application/octet-stream',
           'x-upsert': 'true',
         },
         body: file,
       }
     );
     if (uploadRes.ok) {
-      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/Ciblage_files/${path}`;
+      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/onepager-files/${path}`;
       state.ciblageUploadedNom = file.name;
       // Pre-save URL to BDD
       sbFetch(`/rest/v1/ciblage_assignments?id=eq.${state.ciblageAssignment.id}`, {
@@ -2703,20 +2703,20 @@ async function submitCiblage() {
       const ext  = file.name.split('.').pop();
       const path = `submissions/${state.candidate.id}/${Date.now()}.${ext}`;
       const uploadRes = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/Ciblage_files/${path}`,
+        `${SUPABASE_URL}/storage/v1/object/onepager-files/${path}`,
         {
           method: 'POST',
           headers: {
             'apikey': SUPABASE_ANON,
             'Authorization': 'Bearer ' + SUPABASE_ANON,
-            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Type': file.type || 'application/octet-stream',
             'x-upsert': 'true',
           },
           body: file,
         }
       );
       if (!uploadRes.ok) throw new Error(`Upload ${uploadRes.status}: ${await uploadRes.text()}`);
-      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/Ciblage_files/${path}`;
+      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/onepager-files/${path}`;
       state.ciblageUploadedNom = file.name;
     }
 
