@@ -45,6 +45,8 @@ export default async function handler(req) {
       await sendSubmissionEmails({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL });
     } else if (type === 'fraud_alert') {
       await sendFraudAlert({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL });
+    } else if (type === 'ciblage_submission') {
+      await sendCiblageEmails({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL });
     } else {
       return json({ error: 'Unknown type' }, 400);
     }
@@ -164,6 +166,75 @@ async function sendFraudAlert({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL })
     subject: `🚨 [QCM AUDUN] Alerte fraude — ${prenom} ${nom}`,
     html,
   });
+}
+
+// ============================================================
+// Ciblage submission : email admin + email candidat
+// ============================================================
+async function sendCiblageEmails({ data, RESEND_API_KEY, ADMIN_EMAIL, FROM_EMAIL }) {
+  const {
+    prenom, nom, email, promo,
+    started_at, submitted_at,
+    duree_minutes,
+    statut = 'soumis',
+    fichier_url,
+  } = data;
+
+  const statutLabel = statut === 'soumis' ? '✅ Soumis dans les temps'
+    : statut === 'expire' ? '❌ Expiré sans soumission'
+    : '⚠️ Soumis hors délai';
+
+  const adminHtml = `
+    <div style="font-family:Inter,Arial,sans-serif;color:#1e293b;max-width:600px">
+      <h2 style="color:#0a1628">Ciblage soumis — ${prenom} ${nom}</h2>
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:8px 0;color:#64748b;width:160px">Candidat</td>
+            <td style="padding:8px 0"><strong>${prenom} ${nom}</strong> &lt;${email}&gt;</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Session</td>
+            <td style="padding:8px 0">${promo || '—'}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Démarré</td>
+            <td style="padding:8px 0">${started_at ? new Date(started_at).toLocaleString('fr-FR') : '—'}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Soumis</td>
+            <td style="padding:8px 0">${submitted_at ? new Date(submitted_at).toLocaleString('fr-FR') : '—'}</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Durée</td>
+            <td style="padding:8px 0">${duree_minutes || '—'} minutes</td></tr>
+        <tr><td style="padding:8px 0;color:#64748b">Statut</td>
+            <td style="padding:8px 0">${statutLabel}</td></tr>
+        ${fichier_url ? `<tr><td style="padding:8px 0;color:#64748b">Fichier</td>
+            <td style="padding:8px 0"><a href="${fichier_url}" style="color:#2563eb">${fichier_url}</a></td></tr>` : ''}
+      </table>
+    </div>`;
+
+  const candidatHtml = `
+    <div style="font-family:Inter,Arial,sans-serif;color:#1e293b;max-width:600px">
+      <img src="https://audun-partners.com/logo.png" alt="AUDUN Partners"
+           style="height:40px;margin-bottom:24px" onerror="this.style.display='none'">
+      <p>Bonjour ${prenom},</p>
+      <p>Nous confirmons la bonne réception de votre exercice de ciblage.</p>
+      <p>L'équipe AUDUN Partners reviendra vers vous prochainement.</p>
+      <br>
+      <p>Cordialement,<br><strong>L'équipe AUDUN Partners</strong></p>
+    </div>`;
+
+  const sends = [
+    resendSend({
+      api_key: RESEND_API_KEY,
+      from: `AUDUN Partners <${FROM_EMAIL}>`,
+      to: [ADMIN_EMAIL],
+      subject: `[QCM AUDUN] Ciblage soumis — ${prenom} ${nom}`,
+      html: adminHtml,
+    }),
+  ];
+  if (statut !== 'expire') {
+    sends.push(resendSend({
+      api_key: RESEND_API_KEY,
+      from: `AUDUN Partners <${FROM_EMAIL}>`,
+      to: [email],
+      subject: 'AUDUN Partners — Confirmation exercice de ciblage',
+      html: candidatHtml,
+    }));
+  }
+  await Promise.all(sends);
 }
 
 // ============================================================

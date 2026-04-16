@@ -810,6 +810,55 @@
       transition: background 200ms ease;
     }
     .btn-secondary:hover { background: var(--bg-card-hover); }
+
+    /* ============================================================
+       SCREEN — CA Dashboard
+    ============================================================ */
+    #screen-ca-dashboard {
+      flex-direction: column;
+    }
+
+    /* ============================================================
+       SCREEN — Ciblage Active
+    ============================================================ */
+    #screen-ciblage-active {
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .ciblage-header {
+      position: sticky; top: 0;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 100;
+    }
+    .ciblage-header-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .ciblage-timer-box { display: flex; align-items: center; gap: 10px; }
+    .ciblage-timer-display {
+      font-size: 24px; font-weight: 700;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+      min-width: 76px; text-align: right;
+    }
+    .ciblage-timer-display.urgent { color: var(--danger); }
+
+    .ciblage-body {
+      flex: 1;
+      max-width: 760px; width: 100%;
+      margin: 0 auto;
+      padding: 40px 32px;
+    }
+
+    /* ============================================================
+       SCREEN — Ciblage End
+    ============================================================ */
+    #screen-ciblage-end {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
   </style>
 </head>
 <body>
@@ -889,7 +938,7 @@
       Avant de commencer — Lisez attentivement
     </h2>
 
-    <div class="briefing-text">Ce test est supervisé numériquement en temps réel. Les actions suivantes sont automatiquement détectées, horodatées et transmises à l'équipe AUDUN Partners :
+    <div class="briefing-text" id="briefing-text-content">Ce test est supervisé numériquement en temps réel. Les actions suivantes sont automatiquement détectées, horodatées et transmises à l'équipe AUDUN Partners :
 - Changement d'onglet ou de fenêtre
 - Sortie du mode plein écran
 - Copier / coller
@@ -1174,6 +1223,178 @@ Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mi
 </div>
 
 <!-- ============================================================
+     SCREEN — CA Dashboard
+============================================================ -->
+<div id="screen-ca-dashboard" class="screen">
+  <div class="dashboard-top">
+    <div>
+      <div class="dashboard-greeting" id="ca-dash-greeting">Bienvenue</div>
+      <div class="dashboard-sub" id="ca-dash-sub">Session : —</div>
+    </div>
+    <img src="logo.svg" alt="AUDUN Partners" style="height:36px;object-fit:contain"
+         onerror="this.style.display='none'">
+  </div>
+  <div class="dashboard-cards">
+    <!-- QCM -->
+    <div class="module-card" id="ca-card-qcm" onclick="goToQCM()">
+      <div class="module-card-header">
+        <div class="module-card-icon">📝</div>
+        <span class="module-card-badge badge-todo" id="ca-badge-qcm">À faire</span>
+      </div>
+      <div class="module-card-title">Test QCM</div>
+      <div class="module-card-desc">15 questions — M&amp;A, structuration, développement commercial</div>
+      <div class="module-card-action">Commencer →</div>
+    </div>
+    <!-- Ciblage -->
+    <div class="module-card locked" id="ca-card-ciblage" onclick="goToCiblage()">
+      <div class="module-card-header">
+        <div class="module-card-icon">🎯</div>
+        <span class="module-card-badge badge-locked" id="ca-badge-ciblage">Verrouillé</span>
+      </div>
+      <div class="module-card-title">Exercice de ciblage</div>
+      <div class="module-card-desc" id="ciblage-card-desc">Disponible après le QCM</div>
+      <div class="module-card-action">Commencer →</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN — Ciblage Briefing
+============================================================ -->
+<div id="screen-ciblage-briefing" class="screen">
+  <div class="briefing-card">
+    <h2>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      Exercice de ciblage — Instructions
+    </h2>
+
+    <div class="briefing-text">Vous disposez de <strong>25 minutes</strong> pour réaliser l'exercice de ciblage.
+
+<strong>Consigne :</strong>
+Téléchargez le fichier Excel mis à votre disposition, complétez-le selon les instructions qu'il contient, puis déposez-le avant la fin du chronomètre.
+
+<strong>Règles :</strong>
+- Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mis en pause</strong>
+- Seuls les fichiers au format Excel (.xlsx, .xls) sont acceptés
+- Assurez-vous que votre fichier est finalisé avant de le soumettre
+
+Le non-respect des délais peut entraîner la disqualification de votre candidature.</div>
+
+    <label class="checkbox-row" for="chk-ciblage-accept">
+      <input type="checkbox" id="chk-ciblage-accept" onchange="toggleCiblageBriefingBtn()">
+      <span>Je certifie être prêt à commencer et avoir compris les consignes</span>
+    </label>
+
+    <button class="btn-primary" id="btn-start-ciblage" onclick="confirmStartCiblage()" disabled>
+      Commencer l'exercice de ciblage
+    </button>
+    <button class="btn-secondary" style="width:100%;margin-top:12px;text-align:center"
+            onclick="showScreen('screen-ca-dashboard')">
+      ← Retour au tableau de bord
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN — Ciblage Active
+============================================================ -->
+<div id="screen-ciblage-active" class="screen">
+  <header class="ciblage-header">
+    <div>
+      <div class="ciblage-header-title">Exercice de ciblage</div>
+    </div>
+    <div class="ciblage-timer-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+      </svg>
+      <div class="ciblage-timer-display" id="ciblage-timer-display">25:00</div>
+    </div>
+  </header>
+
+  <div class="ciblage-body">
+    <div id="ciblage-consigne-block" style="display:none;margin-bottom:24px">
+      <p class="op-section-title">Consigne</p>
+      <div class="op-instructions" id="ciblage-consigne-text"></div>
+    </div>
+
+    <div id="ciblage-download-block" style="display:none;margin-bottom:24px">
+      <a id="ciblage-download-link" href="#" target="_blank"
+         style="display:inline-flex;align-items:center;gap:8px;
+                background:var(--blue-primary);color:#fff;
+                border-radius:8px;padding:10px 18px;
+                font-size:14px;font-weight:600;text-decoration:none;
+                transition:background 200ms ease;"
+         onmouseover="this.style.background='var(--blue-light)'"
+         onmouseout="this.style.background='var(--blue-primary)'">
+        ↓ Télécharger le fichier Excel
+      </a>
+    </div>
+
+    <p class="op-section-title">Déposer votre fichier complété</p>
+    <div class="op-upload-zone" id="ciblage-upload-zone"
+         ondragover="ciblageDragOver(event)" ondragleave="ciblageDragLeave(event)" ondrop="ciblageDrop(event)"
+         onclick="document.getElementById('ciblage-file-input').click()">
+      <div class="op-upload-icon">📎</div>
+      <div class="op-upload-label">Glissez votre fichier ici ou cliquez pour sélectionner</div>
+      <div class="op-upload-sub">Excel uniquement (.xlsx, .xls)</div>
+    </div>
+    <input type="file" id="ciblage-file-input" accept=".xlsx,.xls"
+           style="display:none" onchange="ciblageFileSelected(event)">
+
+    <div class="op-file-preview hidden" id="ciblage-file-preview">
+      <span>📊</span>
+      <span class="op-file-name" id="ciblage-file-name">fichier.xlsx</span>
+      <span class="op-file-remove" onclick="ciblageRemoveFile()">Retirer</span>
+    </div>
+
+    <button class="btn-primary" id="btn-submit-ciblage" onclick="submitCiblage()" disabled>
+      Soumettre l'exercice
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCREEN — Ciblage End
+============================================================ -->
+<div id="screen-ciblage-end" class="screen">
+  <div class="end-card">
+    <div class="logo-wrapper" style="margin-bottom:24px">
+      <img src="logo.svg" alt="AUDUN Partners" style="height:40px;object-fit:contain"
+           onerror="this.style.display='none'">
+    </div>
+    <div class="end-icon" id="ciblage-end-icon">🎯</div>
+    <div class="end-title" id="ciblage-end-title">Exercice soumis</div>
+    <div class="end-text" id="ciblage-end-text">
+      Votre exercice de ciblage a bien été enregistré.<br><br>
+      L'équipe AUDUN Partners reviendra vers vous prochainement.
+    </div>
+  </div>
+</div>
+
+<!-- Modal confirmation ciblage -->
+<div class="modal-overlay" id="modal-ciblage-confirm">
+  <div class="modal-box">
+    <h3>⏱ Confirmer le démarrage ?</h3>
+    <p>Le chronomètre de <strong>25 minutes</strong> démarrera immédiatement et ne pourra pas être mis en pause. Assurez-vous d'être prêt.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary"
+              onclick="document.getElementById('modal-ciblage-confirm').classList.remove('open')">
+        Annuler
+      </button>
+      <button class="btn-primary" style="width:auto" onclick="startCiblage()">
+        Confirmer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
 <script>
@@ -1201,6 +1422,16 @@ let state = {
   fraudEventCount: 0,
   fraudListeners: [],
   isResuming: false,      // true si reconnexion en cours de QCM
+  // Recrutement
+  typeRecrutement: 'analyste',
+  nbQuestions: 20,
+  // Ciblage (Chargé d'Affaires)
+  fichierCiblageUrl: null,
+  ciblageAssignment: null,
+  ciblageTimerInterval: null,
+  ciblageUploadedUrl: null,
+  ciblageUploadedNom: null,
+  ciblageFileObj: null,
   // One Pager
   opAssignment:   null,   // { id, session_id, company_id }
   opCompany:      null,   // { id, nom, secteur, description }
@@ -1330,6 +1561,10 @@ async function commencer() {
       questionIds = cand.questions_tirees;
       state.reponses = cand.reponses || {};
       state.candidate = { id: candidateId, nom, prenom, email, session_id: state.session.id, statut: cand.statut };
+      // Détecter type recrutement depuis la session
+      const posteResume = state.session.type_recrutement === 'charge_affaires' ? 'charge_affaires' : 'analyste';
+      state.typeRecrutement = posteResume;
+      state.nbQuestions = posteResume === 'charge_affaires' ? 15 : 20;
       if (cand.statut === 'soumis') {
         // QCM already done — go straight to dashboard
         await loadDashboard();
@@ -1338,15 +1573,21 @@ async function commencer() {
       // Reprendre un test QCM en cours
       state.isResuming = Object.keys(state.reponses).length > 0;
     } else {
-      // Tirer 20 questions aléatoires
-      const allQ = await sbFetch(
-        `/rest/v1/questions?actif=eq.true&select=id`
-      );
-      if (!allQ || allQ.length < NB_QUESTIONS) {
+      // Détecter le type de recrutement
+      const poste = state.session.type_recrutement === 'charge_affaires' ? 'charge_affaires' : 'analyste';
+      state.typeRecrutement = poste;
+      state.nbQuestions = poste === 'charge_affaires' ? 15 : 20;
+
+      const qUrl = poste === 'charge_affaires'
+        ? `/rest/v1/questions?actif=eq.true&poste=eq.charge_affaires&select=id`
+        : `/rest/v1/questions?actif=eq.true&or=(poste.eq.analyste,poste.is.null)&select=id`;
+
+      const allQ = await sbFetch(qUrl);
+      if (!allQ || allQ.length < state.nbQuestions) {
         toast('Pas assez de questions disponibles pour ce test.', 'error');
         return;
       }
-      const shuffled = allQ.sort(() => Math.random() - 0.5).slice(0, NB_QUESTIONS);
+      const shuffled = allQ.sort(() => Math.random() - 0.5).slice(0, state.nbQuestions);
       questionIds = shuffled.map(q => q.id);
 
       // Créer le candidat
@@ -1414,7 +1655,8 @@ async function startTest() {
 // SCREEN 3 — Test
 // ============================================================
 function updateProgressBar() {
-  const pct = (state.currentIndex / NB_QUESTIONS) * 100;
+  const nbQ = state.nbQuestions || NB_QUESTIONS;
+  const pct = (state.currentIndex / nbQ) * 100;
   document.getElementById('progress-bar').style.width = pct + '%';
 }
 
@@ -1424,8 +1666,9 @@ function loadQuestion(index) {
   state.selectedOption = null;
 
   // Compteur
+  const nbQ = state.nbQuestions || NB_QUESTIONS;
   document.getElementById('q-current').textContent = index + 1;
-  document.getElementById('q-total').textContent   = NB_QUESTIONS;
+  document.getElementById('q-total').textContent   = nbQ;
 
   // Progress bar
   updateProgressBar();
@@ -1464,7 +1707,7 @@ function loadQuestion(index) {
   // Bouton suivant
   const btnNext = document.getElementById('btn-next');
   btnNext.className = 'btn-next';
-  const isLast = (index === NB_QUESTIONS - 1);
+  const isLast = (index === nbQ - 1);
   btnNext.innerHTML = isLast
     ? 'Soumettre le test <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'
     : 'Suivant <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
@@ -1545,7 +1788,8 @@ function recordAnswer(letter) {
 }
 
 function advance() {
-  if (state.currentIndex < NB_QUESTIONS - 1) {
+  const nbQ = state.nbQuestions || NB_QUESTIONS;
+  if (state.currentIndex < nbQ - 1) {
     loadQuestion(state.currentIndex + 1);
   } else {
     submitTest();
@@ -1602,7 +1846,7 @@ async function submitTest() {
           email: state.candidate.email,
           promo: state.session.promo || state.session.code,
           score,
-          score_max: NB_QUESTIONS,
+          score_max: state.nbQuestions || NB_QUESTIONS,
           duree_minutes: dureeMins,
           fraude_flag: fraudeFlag,
           nb_fraud_events: state.fraudEventCount,
@@ -1622,8 +1866,13 @@ async function submitTest() {
 
   // Afficher l'écran de résultat QCM avant le dashboard
   document.getElementById('end-title').textContent = `Test terminé`;
-  document.getElementById('end-text').innerHTML =
-    `Votre résultat a bien été enregistré.<br><br>Cliquez ci-dessous pour accéder à votre espace et démarrer le One Pager.`;
+  if (state.typeRecrutement === 'charge_affaires') {
+    document.getElementById('end-text').innerHTML =
+      `Votre résultat a bien été enregistré.<br><br>Cliquez ci-dessous pour accéder à votre espace et démarrer l'exercice de ciblage.`;
+  } else {
+    document.getElementById('end-text').innerHTML =
+      `Votre résultat a bien été enregistré.<br><br>Cliquez ci-dessous pour accéder à votre espace et démarrer le One Pager.`;
+  }
   document.getElementById('btn-end-continue').disabled = false;
   showScreen('screen-end');
 }
@@ -1730,6 +1979,11 @@ function deactivateFraudDetection() {
 // DASHBOARD
 // ============================================================
 async function loadDashboard() {
+  // Route CA candidates to their own dashboard
+  if (state.typeRecrutement === 'charge_affaires') {
+    await loadCaDashboard();
+    return;
+  }
   showScreen('screen-dashboard');
   const c = state.candidate;
   document.getElementById('dash-greeting').textContent = `Bonjour ${c.prenom} ${c.nom}`;
@@ -1845,6 +2099,11 @@ function goToQCM() {
     const resumeIndex = state.questions.findIndex(q => !(q.id in state.reponses));
     if (resumeIndex === -1) { submitTest(); } else { loadQuestion(resumeIndex); }
     return;
+  }
+  // Update briefing text for CA (15 questions instead of 20)
+  if (state.typeRecrutement === 'charge_affaires') {
+    const briefEl = document.getElementById('briefing-text-content');
+    if (briefEl) briefEl.innerHTML = briefEl.innerHTML.replace('20 questions', '15 questions');
   }
   showScreen('screen-briefing');
 }
@@ -2111,6 +2370,410 @@ async function finalizeOpSubmission(statut) {
       : `Votre one pager a été soumis après l'expiration du délai. Il sera examiné par l'équipe AUDUN Partners.`;
 
   showScreen('screen-op-end');
+}
+
+// ============================================================
+// CA DASHBOARD
+// ============================================================
+async function loadCaDashboard() {
+  showScreen('screen-ca-dashboard');
+  const c = state.candidate;
+  document.getElementById('ca-dash-greeting').textContent = `Bonjour ${c.prenom} ${c.nom}`;
+  document.getElementById('ca-dash-sub').textContent = `Session : ${state.session.promo || state.session.code}`;
+
+  // Refresh QCM statut
+  try {
+    const rows = await sbFetch(`/rest/v1/candidates?id=eq.${c.id}&select=statut`);
+    if (rows && rows[0]) Object.assign(state.candidate, rows[0]);
+  } catch { /* ignore */ }
+
+  // Load ciblage assignment
+  try {
+    const rows = await sbFetch(
+      `/rest/v1/ciblage_assignments?candidate_id=eq.${c.id}&session_id=eq.${c.session_id}&select=*`
+    );
+    if (rows && rows[0]) {
+      state.ciblageAssignment = rows[0];
+    } else {
+      // Check for fichier_ciblage_url on session
+      state.fichierCiblageUrl = state.session.fichier_ciblage_url || null;
+      state.ciblageAssignment = null;
+    }
+  } catch { /* ignore */ }
+
+  renderCaQCMCard();
+  renderCiblageCard();
+}
+
+function renderCaQCMCard() {
+  const card  = document.getElementById('ca-card-qcm');
+  const badge = document.getElementById('ca-badge-qcm');
+  const statut = state.candidate.statut;
+  if (statut === 'soumis') {
+    card.className = 'module-card done';
+    badge.textContent = 'Terminé ✓';
+    badge.className = 'module-card-badge badge-done';
+  } else if (statut === 'en_cours') {
+    card.className = 'module-card';
+    badge.textContent = 'En cours';
+    badge.className = 'module-card-badge badge-progress';
+  } else {
+    card.className = 'module-card';
+    badge.textContent = 'À faire';
+    badge.className = 'module-card-badge badge-todo';
+  }
+}
+
+function renderCiblageCard() {
+  const card  = document.getElementById('ca-card-ciblage');
+  const badge = document.getElementById('ca-badge-ciblage');
+  const desc  = document.getElementById('ciblage-card-desc');
+  const qcmDone = (state.candidate.statut === 'soumis');
+
+  if (!qcmDone) {
+    card.className = 'module-card locked';
+    badge.textContent = 'Verrouillé'; badge.className = 'module-card-badge badge-locked';
+    desc.textContent = 'Disponible après le QCM';
+    return;
+  }
+
+  const a = state.ciblageAssignment;
+  if (!a) {
+    card.className = 'module-card';
+    badge.textContent = 'À faire'; badge.className = 'module-card-badge badge-todo';
+    desc.textContent = 'Cliquez pour démarrer l\'exercice';
+    return;
+  }
+  if (a.statut === 'soumis') {
+    card.className = 'module-card done';
+    badge.textContent = 'Soumis ✓'; badge.className = 'module-card-badge badge-done';
+    desc.textContent = 'Exercice soumis dans les temps';
+    return;
+  }
+  if (a.statut === 'expire') {
+    card.className = 'module-card done';
+    badge.textContent = 'Expiré'; badge.className = 'module-card-badge badge-expired';
+    desc.textContent = 'Délai expiré';
+    return;
+  }
+  if (a.statut === 'en_cours') {
+    card.className = 'module-card';
+    badge.textContent = 'En cours'; badge.className = 'module-card-badge badge-progress';
+    desc.textContent = 'En cours — cliquez pour reprendre';
+    return;
+  }
+  card.className = 'module-card';
+  badge.textContent = 'À faire'; badge.className = 'module-card-badge badge-todo';
+  desc.textContent = 'Cliquez pour démarrer l\'exercice';
+}
+
+function goToCiblage() {
+  if (state.candidate.statut !== 'soumis') return;
+  const a = state.ciblageAssignment;
+  if (a && (a.statut === 'soumis' || a.statut === 'expire')) return;
+  if (a && a.statut === 'en_cours') { loadCiblageActiveScreen(); return; }
+  // Show briefing
+  document.getElementById('chk-ciblage-accept').checked = false;
+  document.getElementById('btn-start-ciblage').disabled = true;
+  showScreen('screen-ciblage-briefing');
+}
+
+function toggleCiblageBriefingBtn() {
+  document.getElementById('btn-start-ciblage').disabled =
+    !document.getElementById('chk-ciblage-accept').checked;
+}
+
+function confirmStartCiblage() {
+  document.getElementById('modal-ciblage-confirm').classList.add('open');
+}
+
+async function startCiblage() {
+  document.getElementById('modal-ciblage-confirm').classList.remove('open');
+  const btn = document.getElementById('btn-start-ciblage');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Démarrage…';
+
+  try {
+    const now      = new Date();
+    const deadline = new Date(now.getTime() + 25 * 60 * 1000).toISOString();
+
+    // Get fichier_ciblage_url from session if not already loaded
+    if (!state.fichierCiblageUrl && state.session.fichier_ciblage_url) {
+      state.fichierCiblageUrl = state.session.fichier_ciblage_url;
+    }
+
+    const newRows = await sbFetch('/rest/v1/ciblage_assignments', {
+      method: 'POST',
+      headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({
+        session_id:           state.session.id,
+        candidate_id:         state.candidate.id,
+        fichier_consigne_url: state.fichierCiblageUrl || null,
+        started_at:           now.toISOString(),
+        deadline:             deadline,
+        statut:               'en_cours',
+      }),
+    });
+    state.ciblageAssignment = newRows[0];
+    loadCiblageActiveScreen();
+  } catch(e) {
+    toast('Erreur au démarrage. Réessayez.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Commencer l\'exercice de ciblage';
+  }
+}
+
+// ============================================================
+// CIBLAGE ACTIVE SCREEN
+// ============================================================
+function loadCiblageActiveScreen() {
+  const a = state.ciblageAssignment;
+
+  // Download button
+  const fileUrl = a?.fichier_consigne_url || state.fichierCiblageUrl || null;
+  const dlBlock = document.getElementById('ciblage-download-block');
+  const dlLink  = document.getElementById('ciblage-download-link');
+  if (fileUrl) {
+    dlLink.href = fileUrl;
+    dlBlock.style.display = '';
+  } else {
+    dlBlock.style.display = 'none';
+  }
+
+  // Consigne
+  const consBlock = document.getElementById('ciblage-consigne-block');
+  const consText  = document.getElementById('ciblage-consigne-text');
+  if (state.session.consigne && state.session.consigne.trim()) {
+    consText.textContent = state.session.consigne.trim();
+    consBlock.style.display = '';
+  } else {
+    consBlock.style.display = 'none';
+  }
+
+  // Reset upload
+  state.ciblageFileObj = null;
+  document.getElementById('ciblage-file-preview').classList.add('hidden');
+  document.getElementById('ciblage-upload-zone').style.display = '';
+  document.getElementById('ciblage-file-input').value = '';
+  document.getElementById('btn-submit-ciblage').disabled = true;
+
+  showScreen('screen-ciblage-active');
+  startCiblageTimer();
+}
+
+function startCiblageTimer() {
+  clearInterval(state.ciblageTimerInterval);
+  const deadline = new Date(state.ciblageAssignment.deadline).getTime();
+
+  function tick() {
+    const remaining = Math.max(0, deadline - Date.now());
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    const el = document.getElementById('ciblage-timer-display');
+    if (el) {
+      el.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      el.classList.toggle('urgent', mins < 5);
+    }
+    if (remaining <= 0) { clearInterval(state.ciblageTimerInterval); handleCiblageExpiry(); }
+  }
+
+  tick();
+  state.ciblageTimerInterval = setInterval(tick, 1000);
+}
+
+function handleCiblageExpiry() {
+  document.getElementById('btn-submit-ciblage').disabled = true;
+
+  if (state.ciblageUploadedUrl) {
+    // File uploaded before expiry — finalize as soumis
+    finalizeCiblageSubmission('soumis').catch(() => {});
+    return;
+  }
+
+  // No file — expire
+  sbFetch(`/rest/v1/ciblage_assignments?id=eq.${state.ciblageAssignment.id}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({ statut: 'expire' }),
+  }).catch(() => {});
+
+  state.ciblageAssignment.statut = 'expire';
+
+  fetch(API_SEND_EMAIL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'ciblage_submission',
+      data: {
+        prenom: state.candidate.prenom,
+        nom:    state.candidate.nom,
+        email:  state.candidate.email,
+        promo:  state.session.promo || state.session.code,
+        started_at:    state.ciblageAssignment.started_at,
+        submitted_at:  new Date().toISOString(),
+        duree_minutes: 25,
+        statut: 'expire',
+        fichier_url: null,
+      },
+    }),
+  }).catch(() => {});
+
+  toast('Temps écoulé — votre exercice a expiré.', 'warn');
+  document.getElementById('ciblage-end-icon').textContent = '⏰';
+  document.getElementById('ciblage-end-title').textContent = 'Temps écoulé';
+  document.getElementById('ciblage-end-text').innerHTML =
+    'Le délai de 25 minutes est dépassé.<br><br>L\'équipe AUDUN Partners a été notifiée.';
+  setTimeout(() => showScreen('screen-ciblage-end'), 2500);
+}
+
+// ============================================================
+// CIBLAGE FILE UPLOAD
+// ============================================================
+function ciblageDragOver(e)  { e.preventDefault(); document.getElementById('ciblage-upload-zone').classList.add('dragover'); }
+function ciblageDragLeave()  { document.getElementById('ciblage-upload-zone').classList.remove('dragover'); }
+function ciblageDrop(e) {
+  e.preventDefault();
+  document.getElementById('ciblage-upload-zone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processCiblageFile(file);
+}
+function ciblageFileSelected(e) { const f = e.target.files[0]; if (f) processCiblageFile(f); }
+function ciblageRemoveFile() {
+  state.ciblageFileObj = null;
+  state.ciblageUploadedUrl = null;
+  state.ciblageUploadedNom = null;
+  document.getElementById('ciblage-file-preview').classList.add('hidden');
+  document.getElementById('ciblage-upload-zone').style.display = '';
+  document.getElementById('ciblage-file-input').value = '';
+  document.getElementById('btn-submit-ciblage').disabled = true;
+}
+
+async function processCiblageFile(file) {
+  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+    toast('Format non accepté. Utilisez un fichier Excel (.xlsx ou .xls).', 'warn'); return;
+  }
+  if (file.size > 20 * 1024 * 1024) {
+    toast('Fichier trop volumineux (max 20 Mo).', 'warn'); return;
+  }
+  state.ciblageFileObj = file;
+  document.getElementById('ciblage-file-name').textContent = file.name;
+  document.getElementById('ciblage-file-preview').classList.remove('hidden');
+  document.getElementById('ciblage-upload-zone').style.display = 'none';
+  document.getElementById('btn-submit-ciblage').disabled = false;
+
+  // Fire-and-forget upload to storage
+  try {
+    const ext  = file.name.split('.').pop();
+    const path = `submissions/${state.candidate.id}/${Date.now()}.${ext}`;
+    const uploadRes = await fetch(
+      `${SUPABASE_URL}/storage/v1/object/ciblage-files/${path}`,
+      {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_ANON,
+          'Authorization': 'Bearer ' + SUPABASE_ANON,
+          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'x-upsert': 'true',
+        },
+        body: file,
+      }
+    );
+    if (uploadRes.ok) {
+      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/ciblage-files/${path}`;
+      state.ciblageUploadedNom = file.name;
+      // Pre-save URL to BDD
+      sbFetch(`/rest/v1/ciblage_assignments?id=eq.${state.ciblageAssignment.id}`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ fichier_rendu_url: state.ciblageUploadedUrl, fichier_rendu_nom: file.name }),
+      }).catch(() => {});
+    }
+  } catch { /* ignore — will retry on submit */ }
+}
+
+async function submitCiblage() {
+  const btn = document.getElementById('btn-submit-ciblage');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Envoi en cours…';
+
+  try {
+    if (!state.ciblageUploadedUrl && state.ciblageFileObj) {
+      // Upload not done yet (pre-upload may have failed)
+      const file = state.ciblageFileObj;
+      const ext  = file.name.split('.').pop();
+      const path = `submissions/${state.candidate.id}/${Date.now()}.${ext}`;
+      const uploadRes = await fetch(
+        `${SUPABASE_URL}/storage/v1/object/ciblage-files/${path}`,
+        {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON,
+            'Authorization': 'Bearer ' + SUPABASE_ANON,
+            'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'x-upsert': 'true',
+          },
+          body: file,
+        }
+      );
+      if (!uploadRes.ok) throw new Error(`Upload ${uploadRes.status}: ${await uploadRes.text()}`);
+      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/ciblage-files/${path}`;
+      state.ciblageUploadedNom = file.name;
+    }
+
+    await finalizeCiblageSubmission('soumis');
+
+  } catch(e) {
+    console.error(e);
+    toast('Erreur lors de l\'envoi. Réessayez.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Soumettre l\'exercice';
+  }
+}
+
+async function finalizeCiblageSubmission(statut) {
+  clearInterval(state.ciblageTimerInterval);
+  const submittedAt = new Date().toISOString();
+  const dureeMs     = new Date(submittedAt) - new Date(state.ciblageAssignment.started_at);
+  const dureeMins   = Math.round(dureeMs / 60000);
+
+  await sbFetch(`/rest/v1/ciblage_assignments?id=eq.${state.ciblageAssignment.id}`, {
+    method: 'PATCH',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      submitted_at:    submittedAt,
+      statut:          statut,
+      fichier_rendu_url: state.ciblageUploadedUrl,
+      fichier_rendu_nom: state.ciblageUploadedNom,
+    }),
+  });
+
+  state.ciblageAssignment.statut = statut;
+
+  fetch(API_SEND_EMAIL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'ciblage_submission',
+      data: {
+        prenom:        state.candidate.prenom,
+        nom:           state.candidate.nom,
+        email:         state.candidate.email,
+        promo:         state.session.promo || state.session.code,
+        started_at:    state.ciblageAssignment.started_at,
+        submitted_at:  submittedAt,
+        duree_minutes: dureeMins,
+        statut,
+        fichier_url:   state.ciblageUploadedUrl,
+      },
+    }),
+  }).catch(() => {});
+
+  document.getElementById('ciblage-end-icon').textContent = '✓';
+  document.getElementById('ciblage-end-title').textContent = 'Exercice soumis !';
+  document.getElementById('ciblage-end-text').innerHTML =
+    `Votre exercice de ciblage a bien été enregistré.<br><br>L'équipe AUDUN Partners reviendra vers vous prochainement.`;
+
+  showScreen('screen-ciblage-end');
 }
 </script>
 

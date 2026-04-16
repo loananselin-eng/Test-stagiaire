@@ -421,6 +421,47 @@
     .subtab-btn.active { color: var(--blue-primary); border-bottom-color: var(--blue-primary); }
     .subtab-content { display: none; }
     .subtab-content.active { display: block; }
+
+    /* Sélecteur de recrutement */
+    .recruitment-bar {
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 32px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .rec-btn {
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      transition: all 200ms ease;
+    }
+    .rec-btn.active {
+      background: var(--blue-primary);
+      color: #fff;
+      border-color: var(--blue-primary);
+    }
+    .rec-btn:hover:not(.active) {
+      border-color: var(--border-accent);
+      color: var(--text-primary);
+    }
+    .rec-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+
+    /* Badge ciblage statut */
+    .badge-grey    { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+    .badge-blue    { background: rgba(59,130,246,0.15);  color: var(--blue-light); }
   </style>
 </head>
 <body>
@@ -439,7 +480,9 @@
       <div style="font-size:18px;font-weight:700;margin-top:8px">AUDUN Partners</div>
     </div>
     <h1>Administration QCM</h1>
-    <p>Accès réservé à l'équipe interne</p>
+    <p>Accès réservé à l'équipe interne<br>
+      <span style="font-size:11px;color:var(--text-muted)">Mot de passe Analyste M&A ou Chargé d'Affaires M&A</span>
+    </p>
     <label for="admin-pwd">Mot de passe</label>
     <input type="password" id="admin-pwd" placeholder="••••••••"
            onkeydown="if(event.key==='Enter')login()">
@@ -466,13 +509,22 @@
     </div>
   </header>
 
+  <!-- Sélecteur de recrutement -->
+  <div class="recruitment-bar">
+    <span class="rec-label">Recrutement :</span>
+    <button id="rec-btn-analyste" class="rec-btn active"
+            onclick="switchRecruitmentTab('analyste')">Analyste M&A</button>
+    <button id="rec-btn-charge_affaires" class="rec-btn"
+            onclick="switchRecruitmentTab('charge_affaires')">Chargé d'Affaires M&A</button>
+  </div>
+
   <!-- Tab bar -->
   <nav class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
-    <button class="tab-btn" onclick="switchTab('questions')">Questions</button>
-    <button class="tab-btn" onclick="switchTab('sessions')">Sessions</button>
-    <button class="tab-btn" onclick="switchTab('onepager')">One Pager</button>
-    <button class="tab-btn" onclick="switchTab('parametres')">Paramètres</button>
+    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab-btn" data-tab="questions" onclick="switchTab('questions')">Questions</button>
+    <button class="tab-btn" data-tab="sessions" onclick="switchTab('sessions')">Sessions</button>
+    <button class="tab-btn" id="tab-btn-fourth" data-tab="onepager" onclick="switchFourthTab(event)">One Pager</button>
+    <button class="tab-btn" data-tab="parametres" onclick="switchTab('parametres')">Paramètres</button>
   </nav>
 
   <!-- ============================================================
@@ -504,6 +556,7 @@
               <th>Candidat</th>
               <th>Email</th>
               <th>Session</th>
+              <th>Poste</th>
               <th>Début</th>
               <th>Fin</th>
               <th>Durée</th>
@@ -512,7 +565,7 @@
             </tr>
           </thead>
           <tbody id="candidates-tbody">
-            <tr class="loading-row"><td colspan="8"><span class="spinner"></span>Chargement…</td></tr>
+            <tr class="loading-row"><td colspan="9"><span class="spinner"></span>Chargement…</td></tr>
           </tbody>
         </table>
       </div>
@@ -661,6 +714,40 @@
   </div>
 
   <!-- ============================================================
+       TAB: CIBLAGE (Chargé d'Affaires)
+  ============================================================ -->
+  <div id="tab-ciblage" class="tab-content">
+    <div class="section-header">
+      <div>
+        <h2>Exercices de ciblage</h2>
+        <p>Résultats des candidats Chargé d'Affaires M&A</p>
+      </div>
+      <button class="btn-secondary" onclick="loadCiblageResultats()">↻ Actualiser</button>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Candidat</th>
+              <th>Session</th>
+              <th>Démarré</th>
+              <th>Soumis</th>
+              <th>Durée utilisée</th>
+              <th>Statut</th>
+              <th>Fichier rendu</th>
+            </tr>
+          </thead>
+          <tbody id="ciblage-tbody">
+            <tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
        TAB: PARAMÈTRES
   ============================================================ -->
   <div id="tab-parametres" class="tab-content">
@@ -799,6 +886,7 @@
       <button class="modal-close" onclick="closeModal('modal-session')">&times;</button>
     </div>
     <form onsubmit="saveSession(event)">
+      <input type="hidden" id="s-type-recrutement" value="analyste">
       <label>Label / Promo</label>
       <input type="text" id="s-promo" placeholder="Ex : Promotion Printemps 2025" required>
       <label>Code d'accès *</label>
@@ -807,9 +895,28 @@
              oninput="this.value=this.value.toUpperCase()">
       <label>Temps par question (secondes)</label>
       <input type="number" id="s-temps" value="25" min="5" max="300">
+
+      <!-- Champ ciblage — visible uniquement pour CA -->
+      <div id="s-ciblage-section" style="display:none">
+        <label>Fichier Excel de ciblage *</label>
+        <p style="font-size:12px;color:var(--text-secondary);margin-top:-10px;margin-bottom:12px">
+          Uploadez le fichier .xlsx que les candidats devront compléter.
+        </p>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+          <input type="file" id="s-ciblage-file" accept=".xlsx,.xls"
+                 style="flex:1;padding:8px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;font-size:13px">
+          <button type="button" class="btn-secondary btn-sm" onclick="uploadCiblageTemplate()">
+            Uploader
+          </button>
+        </div>
+        <div id="s-ciblage-upload-status"
+             style="font-size:12px;color:var(--text-secondary);margin-bottom:16px"></div>
+        <input type="hidden" id="s-ciblage-url">
+      </div>
+
       <div class="modal-footer">
         <button type="button" class="btn-secondary" onclick="closeModal('modal-session')">Annuler</button>
-        <button type="submit" class="btn-primary">Créer la session</button>
+        <button type="submit" class="btn-primary" id="btn-save-session">Créer la session</button>
       </div>
     </form>
   </div>
@@ -877,18 +984,18 @@
 // ============================================================
 const SUPABASE_URL  = 'https://gdtcupcvxeidhimmwbxh.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdkdGN1cGN2eGVpZGhpbW13YnhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NTM0MDQsImV4cCI6MjA5MTIyOTQwNH0.-wqqOj7qM5XjitcFsi4zLRPNt2_JgWcQ_gFpqVswyQE';
-// ADMIN_PASSWORD est lu depuis localStorage (défini côté Vercel env → non exposable).
-// Alternative : stocker un hash en localStorage après première connexion.
-// Pour l'instant, comparaison directe avec le mot de passe stocké en localStorage.
 const ADMIN_PWD_KEY = 'audun_admin_pwd';
+const ADMIN_CA_PWD  = 'CHAF0726';  // Mot de passe Chargé d'Affaires
 
 // ============================================================
 // STATE
 // ============================================================
-let currentCandidateData = null; // pour l'export CSV
-let allQuestions = [];
-let allSessions  = [];
+let currentCandidateData  = null; // pour l'export CSV
+let allQuestions  = [];
+let allSessions   = [];
 let allCandidates = [];
+let currentRecruitmentTab = localStorage.getItem('audun_recruitment_tab') || 'analyste';
+let currentAdminType      = 'analyste'; // set at login
 
 // ============================================================
 // SUPABASE HELPERS
@@ -916,9 +1023,19 @@ async function sbFetch(path, opts = {}) {
 // ============================================================
 function login() {
   const pwd = document.getElementById('admin-pwd').value;
-  const stored = localStorage.getItem(ADMIN_PWD_KEY);
+  document.getElementById('login-error').style.display = 'none';
 
-  // Premier lancement : stocker le mot de passe
+  // Vérifier mot de passe Chargé d'Affaires en premier
+  if (pwd === ADMIN_CA_PWD) {
+    currentAdminType      = 'charge_affaires';
+    currentRecruitmentTab = 'charge_affaires';
+    localStorage.setItem('audun_recruitment_tab', 'charge_affaires');
+    showApp();
+    return;
+  }
+
+  // Mot de passe Analyste (localStorage)
+  const stored = localStorage.getItem(ADMIN_PWD_KEY);
   if (!stored) {
     if (pwd.length < 6) {
       document.getElementById('login-error').textContent = 'Mot de passe trop court (6 caractères min).';
@@ -926,11 +1043,15 @@ function login() {
       return;
     }
     localStorage.setItem(ADMIN_PWD_KEY, pwd);
+    currentAdminType      = 'analyste';
+    currentRecruitmentTab = 'analyste';
+    localStorage.setItem('audun_recruitment_tab', 'analyste');
     showApp();
     return;
   }
 
   if (pwd === stored) {
+    currentAdminType = 'analyste';
     showApp();
   } else {
     document.getElementById('login-error').style.display = 'block';
@@ -940,8 +1061,50 @@ function login() {
 function showApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-app').classList.add('visible');
+  // Initialiser le sélecteur de recrutement
+  applyRecruitmentTab(currentRecruitmentTab);
   loadDashboard();
   loadAdminEmailSetting();
+}
+
+function applyRecruitmentTab(type) {
+  currentRecruitmentTab = type;
+  // Boutons
+  document.querySelectorAll('.rec-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('rec-btn-' + type);
+  if (btn) btn.classList.add('active');
+  // Libellé quatrième tab
+  const fourthBtn = document.getElementById('tab-btn-fourth');
+  if (fourthBtn) {
+    if (type === 'charge_affaires') {
+      fourthBtn.textContent = 'Ciblage';
+      fourthBtn.dataset.tab = 'ciblage';
+    } else {
+      fourthBtn.textContent = 'One Pager';
+      fourthBtn.dataset.tab = 'onepager';
+    }
+  }
+}
+
+function switchRecruitmentTab(type) {
+  localStorage.setItem('audun_recruitment_tab', type);
+  applyRecruitmentTab(type);
+
+  // Si on est sur le quatrième tab, revenir au dashboard
+  const activeTab = document.querySelector('.tab-content.active');
+  if (activeTab?.id === 'tab-onepager' || activeTab?.id === 'tab-ciblage') {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-tab="dashboard"]').classList.add('active');
+    document.getElementById('tab-dashboard').classList.add('active');
+    loadDashboard();
+    return;
+  }
+
+  // Recharger le tab actif avec les nouveaux filtres
+  if (activeTab?.id === 'tab-dashboard') loadDashboard();
+  if (activeTab?.id === 'tab-questions') loadQuestions();
+  if (activeTab?.id === 'tab-sessions')  loadSessions();
 }
 
 function logout() {
@@ -960,9 +1123,20 @@ function switchTab(name) {
   event.target.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
 
-  if (name === 'questions')  loadQuestions();
-  if (name === 'sessions')   loadSessions();
-  if (name === 'onepager')   loadOpTab();
+  if (name === 'questions') loadQuestions();
+  if (name === 'sessions')  loadSessions();
+  if (name === 'onepager')  loadOpTab();
+  if (name === 'ciblage')   loadCiblageResultats();
+}
+
+function switchFourthTab(evt) {
+  const name = currentRecruitmentTab === 'charge_affaires' ? 'ciblage' : 'onepager';
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  evt.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'onepager') loadOpTab();
+  if (name === 'ciblage')  loadCiblageResultats();
 }
 
 // ============================================================
@@ -970,29 +1144,45 @@ function switchTab(name) {
 // ============================================================
 async function loadDashboard() {
   const tbody = document.getElementById('candidates-tbody');
-  tbody.innerHTML = '<tr class="loading-row"><td colspan="8"><span class="spinner"></span>Chargement…</td></tr>';
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="9"><span class="spinner"></span>Chargement…</td></tr>';
 
   try {
     const [candidates, sessions] = await Promise.all([
       sbFetch('/rest/v1/candidates?select=*&order=submitted_at.desc.nullslast'),
-      sbFetch('/rest/v1/sessions?select=id,promo,code'),
+      sbFetch('/rest/v1/sessions?select=id,promo,code,type_recrutement'),
     ]);
 
-    allCandidates = candidates || [];
     const sessMap = {};
-    (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
+    const sessTypeMap = {};
+    (sessions || []).forEach(s => {
+      sessMap[s.id]     = s.promo || s.code;
+      sessTypeMap[s.id] = s.type_recrutement || 'analyste';
+    });
+
+    // Filtrer selon le tab de recrutement actif
+    // Les sessions sans type (null) sont traitées comme 'analyste'
+    allCandidates = (candidates || []).filter(c => {
+      const t = sessTypeMap[c.session_id] || 'analyste';
+      return t === currentRecruitmentTab;
+    });
 
     // Stats
-    const soumis   = allCandidates.filter(c => c.statut === 'soumis').length;
-    const encours  = allCandidates.filter(c => c.statut === 'en_cours').length;
-    const alertes  = allCandidates.filter(c => c.fraude_flag === 'alerte').length;
+    const soumis  = allCandidates.filter(c => c.statut === 'soumis').length;
+    const encours = allCandidates.filter(c => c.statut === 'en_cours').length;
+    const alertes = allCandidates.filter(c => c.fraude_flag === 'alerte').length;
     document.getElementById('stat-total').textContent   = allCandidates.length;
     document.getElementById('stat-soumis').textContent  = soumis;
     document.getElementById('stat-encours').textContent = encours;
     document.getElementById('stat-fraude').textContent  = alertes;
 
+    // Libellé colonne poste dans le header
+    const posteLabel = currentRecruitmentTab === 'charge_affaires' ? 'Chargé d\'Affaires' : 'Analyste';
+    document.querySelector('#candidates-table thead tr').innerHTML = `
+      <th>Candidat</th><th>Email</th><th>Session</th><th>Poste</th>
+      <th>Début</th><th>Fin</th><th>Durée</th><th>Score</th><th>Fraude</th>`;
+
     if (allCandidates.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Aucun candidat enregistré.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Aucun candidat enregistré.</td></tr>';
       return;
     }
 
@@ -1011,6 +1201,7 @@ async function loadDashboard() {
         <td><strong style="color:var(--text-primary)">${c.prenom} ${c.nom}</strong></td>
         <td>${c.email}</td>
         <td>${sessMap[c.session_id] || '—'}</td>
+        <td><span style="font-size:11px;color:var(--text-muted)">${posteLabel}</span></td>
         <td>${startedAt}</td>
         <td>${submittedAt}</td>
         <td>${duree}</td>
@@ -1020,7 +1211,7 @@ async function loadDashboard() {
     }).join('');
 
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--danger);padding:24px">
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--danger);padding:24px">
       Erreur : ${e.message}</td></tr>`;
   }
 }
@@ -1165,9 +1356,15 @@ async function loadQuestions() {
   tbody.innerHTML = '<tr class="loading-row"><td colspan="5"><span class="spinner"></span>Chargement…</td></tr>';
 
   try {
-    allQuestions = await sbFetch('/rest/v1/questions?select=*&order=created_at.desc') || [];
+    const poste = currentRecruitmentTab === 'charge_affaires' ? 'charge_affaires' : 'analyste';
+    // Pour analyste : inclure aussi les questions sans poste (null = stock existant)
+    const posteQuery = poste === 'analyste'
+      ? `/rest/v1/questions?or=(poste.eq.analyste,poste.is.null)&select=*&order=created_at.desc`
+      : `/rest/v1/questions?poste=eq.charge_affaires&select=*&order=created_at.desc`;
+    allQuestions = await sbFetch(posteQuery) || [];
+    const recLabel = currentRecruitmentTab === 'charge_affaires' ? 'Chargé d\'Affaires' : 'Analyste';
     document.getElementById('questions-count').textContent =
-      `${allQuestions.filter(q => q.actif).length} actives / ${allQuestions.length} total`;
+      `${allQuestions.filter(q => q.actif).length} actives / ${allQuestions.length} total — ${recLabel}`;
 
     if (allQuestions.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Aucune question. Créez-en une !</td></tr>';
@@ -1254,6 +1451,7 @@ async function saveQuestion(e) {
     theme:         document.getElementById('q-theme').value.trim() || null,
     temps:         parseInt(document.getElementById('q-temps').value) || null,
     explication:   document.getElementById('q-explication').value.trim() || null,
+    poste:         currentRecruitmentTab === 'charge_affaires' ? 'charge_affaires' : 'analyste',
     actif:         true,
   };
 
@@ -1316,7 +1514,11 @@ async function loadSessions() {
   tbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>';
 
   try {
-    allSessions = await sbFetch('/rest/v1/sessions?select=*&order=created_at.desc') || [];
+    // Pour analyste : inclure aussi les sessions sans type_recrutement défini (null = ancien)
+    const typeFilter = currentRecruitmentTab === 'charge_affaires'
+      ? '&type_recrutement=eq.charge_affaires'
+      : '&or=(type_recrutement.eq.analyste,type_recrutement.is.null)';
+    allSessions = await sbFetch(`/rest/v1/sessions?select=*&order=created_at.desc${typeFilter}`) || [];
     const candidates = await sbFetch('/rest/v1/candidates?select=session_id,statut') || [];
 
     // Compter par session
@@ -1361,25 +1563,50 @@ async function loadSessions() {
 function openSessionModal() {
   document.getElementById('s-promo').value = '';
   document.getElementById('s-code').value  = '';
-  document.getElementById('s-temps').value = '25';
+  document.getElementById('s-ciblage-url').value = '';
+  document.getElementById('s-ciblage-upload-status').textContent = '';
+
+  const isCA = currentRecruitmentTab === 'charge_affaires';
+  document.getElementById('s-type-recrutement').value = isCA ? 'charge_affaires' : 'analyste';
+  document.getElementById('s-temps').value = isCA ? '45' : '25';
+  document.getElementById('s-ciblage-section').style.display = isCA ? '' : 'none';
+
   document.getElementById('modal-session').classList.add('open');
 }
 
 async function saveSession(e) {
   e.preventDefault();
-  const promo = document.getElementById('s-promo').value.trim();
-  const code  = document.getElementById('s-code').value.trim().toUpperCase();
-  const temps = parseInt(document.getElementById('s-temps').value) || 25;
+  const promo           = document.getElementById('s-promo').value.trim();
+  const code            = document.getElementById('s-code').value.trim().toUpperCase();
+  const temps           = parseInt(document.getElementById('s-temps').value) || 25;
+  const typeRecrutement = document.getElementById('s-type-recrutement').value || 'analyste';
+  const ciblageUrl      = document.getElementById('s-ciblage-url').value.trim() || null;
+
+  const payload = { promo, code, temps_par_question: temps, type_recrutement: typeRecrutement };
+  if (ciblageUrl) payload.fichier_ciblage_url = ciblageUrl;
 
   try {
     await sbFetch('/rest/v1/sessions', {
       method: 'POST',
-      body: JSON.stringify({ promo, code, temps_par_question: temps }),
+      body: JSON.stringify(payload),
     });
     closeModal('modal-session');
     loadSessions();
   } catch (err) {
-    alert('Erreur : ' + err.message);
+    // Si erreur colonne manquante, réessayer sans fichier_ciblage_url
+    if (err.message.includes('fichier_ciblage_url') || err.message.includes('column')) {
+      try {
+        const fallback = { promo, code, temps_par_question: temps, type_recrutement: typeRecrutement };
+        await sbFetch('/rest/v1/sessions', { method: 'POST', body: JSON.stringify(fallback) });
+        closeModal('modal-session');
+        loadSessions();
+        alert('Session créée. Note : la colonne fichier_ciblage_url n\'existe pas encore.\nAjoutez-la dans Supabase : ALTER TABLE sessions ADD COLUMN fichier_ciblage_url text;');
+      } catch(err2) {
+        alert('Erreur : ' + err2.message);
+      }
+    } else {
+      alert('Erreur : ' + err.message);
+    }
   }
 }
 
@@ -1629,6 +1856,113 @@ function opBadge(statut) {
   if (statut === 'expire')         return '<span class="badge badge-alerte">Expiré</span>';
   if (statut === 'en_cours')       return '<span class="badge badge-encours">En cours</span>';
   return '<span class="badge" style="background:rgba(148,163,184,0.15);color:var(--text-muted)">—</span>';
+}
+
+// ============================================================
+// TAB: CIBLAGE
+// ============================================================
+async function loadCiblageResultats() {
+  const tbody = document.getElementById('ciblage-tbody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="7"><span class="spinner"></span>Chargement…</td></tr>';
+
+  try {
+    const [assignments, sessions, candidates] = await Promise.all([
+      sbFetch('/rest/v1/ciblage_assignments?select=*&order=submitted_at.desc.nullslast'),
+      sbFetch('/rest/v1/sessions?select=id,promo,code,type_recrutement'),
+      sbFetch('/rest/v1/candidates?select=id,prenom,nom,session_id'),
+    ]);
+
+    // Filtrer les sessions CA
+    const caSessionIds = new Set(
+      (sessions || [])
+        .filter(s => (s.type_recrutement || 'analyste') === 'charge_affaires')
+        .map(s => s.id)
+    );
+    const sessMap = {};
+    (sessions || []).forEach(s => { sessMap[s.id] = s.promo || s.code; });
+    const candMap = {};
+    (candidates || []).forEach(c => { candMap[c.id] = c; });
+
+    const filtered = (assignments || []).filter(a => caSessionIds.has(a.session_id));
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">Aucun exercice de ciblage enregistré.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(a => {
+      const cand = candMap[a.candidate_id] || {};
+      const duree = a.started_at && a.submitted_at
+        ? Math.round((new Date(a.submitted_at) - new Date(a.started_at)) / 60000) + ' min'
+        : '—';
+      const fichierLink = a.fichier_rendu_url
+        ? `<a href="${a.fichier_rendu_url}" target="_blank"
+              style="color:var(--blue-light);text-decoration:none">↗ Télécharger</a>`
+        : '—';
+      return `<tr>
+        <td><strong style="color:var(--text-primary)">${cand.prenom || '—'} ${cand.nom || ''}</strong></td>
+        <td>${sessMap[a.session_id] || '—'}</td>
+        <td>${fmtDate(a.started_at)}</td>
+        <td>${fmtDate(a.submitted_at)}</td>
+        <td>${duree}</td>
+        <td>${ciblageStatutBadge(a.statut)}</td>
+        <td>${fichierLink}</td>
+      </tr>`;
+    }).join('');
+
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--danger);padding:24px">${e.message}</td></tr>`;
+  }
+}
+
+function ciblageStatutBadge(statut) {
+  if (statut === 'soumis')   return '<span class="badge badge-ok">Soumis ✓</span>';
+  if (statut === 'expire')   return '<span class="badge badge-alerte">Expiré</span>';
+  if (statut === 'en_cours') return '<span class="badge badge-encours">En cours</span>';
+  return '<span class="badge badge-grey">En attente</span>';
+}
+
+// Upload du fichier de ciblage (template) depuis l'interface admin
+async function uploadCiblageTemplate() {
+  const fileInput = document.getElementById('s-ciblage-file');
+  const status    = document.getElementById('s-ciblage-upload-status');
+  const file = fileInput.files[0];
+  if (!file) { status.textContent = 'Sélectionnez un fichier d\'abord.'; return; }
+  if (!file.name.match(/\.(xlsx|xls)$/i)) {
+    status.style.color = 'var(--danger)';
+    status.textContent = 'Format non accepté (.xlsx ou .xls uniquement).';
+    return;
+  }
+
+  status.style.color = 'var(--text-secondary)';
+  status.textContent = 'Upload en cours…';
+
+  try {
+    const timestamp = Date.now();
+    const safeName  = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const path      = `templates/${timestamp}_${safeName}`;
+
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/ciblage-files/${path}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON,
+        'Content-Type': file.type || 'application/octet-stream',
+        'x-upsert': 'true',
+      },
+      body: file,
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/ciblage-files/${path}`;
+    document.getElementById('s-ciblage-url').value = publicUrl;
+    status.style.color = 'var(--success)';
+    status.innerHTML = `✓ Fichier uploadé — <a href="${publicUrl}" target="_blank"
+      style="color:var(--blue-light)">Vérifier</a>`;
+  } catch(err) {
+    status.style.color = 'var(--danger)';
+    status.textContent = 'Erreur : ' + err.message;
+  }
 }
 
 // ============================================================
