@@ -2724,7 +2724,7 @@ async function submitCiblage() {
 
   } catch(e) {
     console.error(e);
-    toast('Erreur lors de l\'envoi. Réessayez.', 'error');
+    toast('Erreur : ' + (e.message || 'inconnue'), 'error');
     btn.disabled = false;
     btn.textContent = 'Soumettre l\'exercice';
   }
