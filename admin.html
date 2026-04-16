@@ -898,20 +898,13 @@
 
       <!-- Champ ciblage — visible uniquement pour CA -->
       <div id="s-ciblage-section" style="display:none">
-        <label>Fichier Excel de ciblage *</label>
-        <p style="font-size:12px;color:var(--text-secondary);margin-top:-10px;margin-bottom:12px">
-          Uploadez le fichier .xlsx que les candidats devront compléter.
+        <label>URL du fichier Excel de ciblage</label>
+        <p style="font-size:12px;color:var(--text-secondary);margin-top:-10px;margin-bottom:8px">
+          Uploadez manuellement le fichier dans Supabase Storage → bucket <code>Ciblage_files</code>, puis copiez-collez l'URL publique ci-dessous.
         </p>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-          <input type="file" id="s-ciblage-file" accept=".xlsx,.xls"
-                 style="flex:1;padding:8px;background:#f8fafc;border:1px solid var(--border);border-radius:8px;font-size:13px">
-          <button type="button" class="btn-secondary btn-sm" onclick="uploadCiblageTemplate()">
-            Uploader
-          </button>
-        </div>
-        <div id="s-ciblage-upload-status"
-             style="font-size:12px;color:var(--text-secondary);margin-bottom:16px"></div>
-        <input type="hidden" id="s-ciblage-url">
+        <input type="text" id="s-ciblage-url"
+               placeholder="https://…/storage/v1/object/public/Ciblage_files/fichier.xlsx"
+               style="font-size:13px">
       </div>
 
       <div class="modal-footer">
@@ -925,6 +918,31 @@
 <!-- ============================================================
      MODAL — Société One Pager
 ============================================================ -->
+<!-- Modal : éditer fichier_ciblage_url d'une session CA -->
+<div id="modal-ciblage-url" class="modal-overlay">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3>Fichier Excel de ciblage</h3>
+      <button class="modal-close" onclick="closeModal('modal-ciblage-url')">&times;</button>
+    </div>
+    <div style="padding:0 24px 8px">
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+        Uploadez votre fichier dans Supabase Storage → bucket <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px">Ciblage_files</code>, puis copiez-collez l'URL publique ci-dessous.
+      </p>
+      <label>URL publique du fichier Excel</label>
+      <input type="hidden" id="ciblage-url-session-id">
+      <input type="text" id="ciblage-url-input"
+             placeholder="https://…/storage/v1/object/public/Ciblage_files/fichier.xlsx"
+             style="font-size:13px;margin-bottom:8px">
+      <p id="ciblage-url-current" style="font-size:12px;color:var(--text-muted);margin-bottom:16px"></p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" onclick="closeModal('modal-ciblage-url')">Annuler</button>
+      <button type="button" class="btn-primary" onclick="saveCiblageUrl()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div id="modal-op-company" class="modal-overlay">
   <div class="modal" style="max-width:500px">
     <div class="modal-header">
@@ -1546,11 +1564,16 @@ async function loadSessions() {
         <td>${cnt.soumis}</td>
         <td>${cnt.encours}</td>
         <td>${badge}</td>
-        <td style="display:flex;gap:8px">
+        <td style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn-secondary btn-sm"
             onclick="toggleSession('${s.id}', ${!s.actif})">
             ${s.actif ? 'Désactiver' : 'Activer'}
           </button>
+          ${s.type_recrutement === 'charge_affaires' ? `
+          <button class="btn-secondary btn-sm" title="${s.fichier_ciblage_url || 'Aucun fichier'}"
+            onclick="openCiblageUrlModal('${s.id}', \`${(s.fichier_ciblage_url || '').replace(/`/g, '')}\`)">
+            📎 ${s.fichier_ciblage_url ? 'Modifier fichier' : 'Ajouter fichier'}
+          </button>` : ''}
         </td>
       </tr>`;
     }).join('');
@@ -1564,7 +1587,6 @@ function openSessionModal() {
   document.getElementById('s-promo').value = '';
   document.getElementById('s-code').value  = '';
   document.getElementById('s-ciblage-url').value = '';
-  document.getElementById('s-ciblage-upload-status').textContent = '';
 
   const isCA = currentRecruitmentTab === 'charge_affaires';
   document.getElementById('s-type-recrutement').value = isCA ? 'charge_affaires' : 'analyste';
@@ -1922,46 +1944,28 @@ function ciblageStatutBadge(statut) {
   return '<span class="badge badge-grey">En attente</span>';
 }
 
-// Upload du fichier de ciblage (template) depuis l'interface admin
-async function uploadCiblageTemplate() {
-  const fileInput = document.getElementById('s-ciblage-file');
-  const status    = document.getElementById('s-ciblage-upload-status');
-  const file = fileInput.files[0];
-  if (!file) { status.textContent = 'Sélectionnez un fichier d\'abord.'; return; }
-  if (!file.name.match(/\.(xlsx|xls)$/i)) {
-    status.style.color = 'var(--danger)';
-    status.textContent = 'Format non accepté (.xlsx ou .xls uniquement).';
-    return;
-  }
+function openCiblageUrlModal(sessionId, currentUrl) {
+  document.getElementById('ciblage-url-session-id').value = sessionId;
+  document.getElementById('ciblage-url-input').value = currentUrl || '';
+  const curr = document.getElementById('ciblage-url-current');
+  curr.textContent = currentUrl ? `URL actuelle : ${currentUrl}` : 'Aucun fichier défini.';
+  document.getElementById('modal-ciblage-url').classList.add('open');
+}
 
-  status.style.color = 'var(--text-secondary)';
-  status.textContent = 'Upload en cours…';
-
+async function saveCiblageUrl() {
+  const sessionId = document.getElementById('ciblage-url-session-id').value;
+  const url       = document.getElementById('ciblage-url-input').value.trim() || null;
   try {
-    const timestamp = Date.now();
-    const safeName  = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const path      = `templates/${timestamp}_${safeName}`;
-
-    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/ciblage-files/${path}`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_ANON,
-        'Authorization': 'Bearer ' + SUPABASE_ANON,
-        'Content-Type': file.type || 'application/octet-stream',
-        'x-upsert': 'true',
-      },
-      body: file,
+    await sbFetch(`/rest/v1/sessions?id=eq.${sessionId}`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ fichier_ciblage_url: url }),
     });
-    if (!res.ok) throw new Error(await res.text());
-
-    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/ciblage-files/${path}`;
-    document.getElementById('s-ciblage-url').value = publicUrl;
-    status.style.color = 'var(--success)';
-    status.innerHTML = `✓ Fichier uploadé — <a href="${publicUrl}" target="_blank"
-      style="color:var(--blue-light)">Vérifier</a>`;
+    closeModal('modal-ciblage-url');
+    loadSessions();
+    toast('URL enregistrée ✓', 'success');
   } catch(err) {
-    status.style.color = 'var(--danger)';
-    status.textContent = 'Erreur : ' + err.message;
+    alert('Erreur : ' + err.message);
   }
 }
 

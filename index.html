@@ -2666,7 +2666,7 @@ async function processCiblageFile(file) {
     const ext  = file.name.split('.').pop();
     const path = `submissions/${state.candidate.id}/${Date.now()}.${ext}`;
     const uploadRes = await fetch(
-      `${SUPABASE_URL}/storage/v1/object/ciblage-files/${path}`,
+      `${SUPABASE_URL}/storage/v1/object/Ciblage_files/${path}`,
       {
         method: 'POST',
         headers: {
@@ -2679,7 +2679,7 @@ async function processCiblageFile(file) {
       }
     );
     if (uploadRes.ok) {
-      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/ciblage-files/${path}`;
+      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/Ciblage_files/${path}`;
       state.ciblageUploadedNom = file.name;
       // Pre-save URL to BDD
       sbFetch(`/rest/v1/ciblage_assignments?id=eq.${state.ciblageAssignment.id}`, {
@@ -2703,7 +2703,7 @@ async function submitCiblage() {
       const ext  = file.name.split('.').pop();
       const path = `submissions/${state.candidate.id}/${Date.now()}.${ext}`;
       const uploadRes = await fetch(
-        `${SUPABASE_URL}/storage/v1/object/ciblage-files/${path}`,
+        `${SUPABASE_URL}/storage/v1/object/Ciblage_files/${path}`,
         {
           method: 'POST',
           headers: {
@@ -2716,7 +2716,7 @@ async function submitCiblage() {
         }
       );
       if (!uploadRes.ok) throw new Error(`Upload ${uploadRes.status}: ${await uploadRes.text()}`);
-      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/ciblage-files/${path}`;
+      state.ciblageUploadedUrl = `${SUPABASE_URL}/storage/v1/object/public/Ciblage_files/${path}`;
       state.ciblageUploadedNom = file.name;
     }
 
