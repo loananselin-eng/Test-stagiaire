@@ -816,6 +816,8 @@
     ============================================================ */
     #screen-ca-dashboard {
       flex-direction: column;
+      align-items: center;
+      padding: 48px 20px;
     }
 
     /* ============================================================
@@ -1242,7 +1244,7 @@ Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mi
         <span class="module-card-badge badge-todo" id="ca-badge-qcm">À faire</span>
       </div>
       <div class="module-card-title">Test QCM</div>
-      <div class="module-card-desc">15 questions — M&amp;A, structuration, développement commercial</div>
+      <div class="module-card-desc">20 questions — M&amp;A, structuration, développement commercial</div>
       <div class="module-card-action">Commencer →</div>
     </div>
     <!-- Ciblage -->
@@ -1584,7 +1586,7 @@ async function commencer() {
       // Détecter type recrutement depuis la session
       const posteResume = state.session.type_recrutement === 'charge_affaires' ? 'charge_affaires' : 'analyste';
       state.typeRecrutement = posteResume;
-      state.nbQuestions = posteResume === 'charge_affaires' ? 15 : 20;
+      state.nbQuestions = (questionIds && questionIds.length) || NB_QUESTIONS;
       if (cand.statut === 'soumis') {
         // QCM already done — go straight to dashboard
         await loadDashboard();
@@ -1596,7 +1598,7 @@ async function commencer() {
       // Détecter le type de recrutement
       const poste = state.session.type_recrutement === 'charge_affaires' ? 'charge_affaires' : 'analyste';
       state.typeRecrutement = poste;
-      state.nbQuestions = poste === 'charge_affaires' ? 15 : 20;
+      state.nbQuestions = NB_QUESTIONS;
 
       const qUrl = poste === 'charge_affaires'
         ? `/rest/v1/questions?actif=eq.true&poste=eq.charge_affaires&select=id`
@@ -2119,11 +2121,6 @@ function goToQCM() {
     const resumeIndex = state.questions.findIndex(q => !(q.id in state.reponses));
     if (resumeIndex === -1) { submitTest(); } else { loadQuestion(resumeIndex); }
     return;
-  }
-  // Update briefing text for CA (15 questions instead of 20)
-  if (state.typeRecrutement === 'charge_affaires') {
-    const briefEl = document.getElementById('briefing-text-content');
-    if (briefEl) briefEl.innerHTML = briefEl.innerHTML.replace('20 questions', '15 questions');
   }
   showScreen('screen-briefing');
 }
