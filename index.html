@@ -1272,15 +1272,18 @@ Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mi
       Exercice de ciblage — Instructions
     </h2>
 
-    <div class="briefing-text">Vous disposez de <strong>25 minutes</strong> pour réaliser l'exercice de ciblage.
+    <div class="briefing-text">Vous disposez de <strong>30 minutes</strong> pour réaliser l'exercice de ciblage.
 
 <strong>Consigne :</strong>
-Téléchargez le fichier Excel mis à votre disposition, complétez-le selon les instructions qu'il contient, puis déposez-le avant la fin du chronomètre.
+Téléchargez le fichier Excel : il contient une liste de 25 sociétés et toutes les instructions (onglet « Consignes »). Pour chaque société, décidez si elle fait partie de votre top 5, si elle est secondaire ou si elle est à écarter, et justifiez votre choix. Enrichissez votre top 5, puis rédigez votre accroche d'appel dans l'onglet « Synthèse ».
+
+<strong>Dépôt :</strong>
+- Le fichier Excel complété (obligatoire)
+- Un fichier complémentaire si vous le souhaitez, par exemple un one pager (PDF, Word ou PowerPoint)
 
 <strong>Règles :</strong>
 - Le chronomètre démarre dès que vous confirmez et <strong>ne peut pas être mis en pause</strong>
-- Seuls les fichiers au format Excel (.xlsx, .xls) sont acceptés
-- Assurez-vous que votre fichier est finalisé avant de le soumettre
+- Assurez-vous que vos fichiers sont finalisés avant de les soumettre
 
 Le non-respect des délais peut entraîner la disqualification de votre candidature.</div>
 
@@ -1313,7 +1316,7 @@ Le non-respect des délais peut entraîner la disqualification de votre candidat
         <circle cx="12" cy="12" r="10"/>
         <polyline points="12 6 12 12 16 14"/>
       </svg>
-      <div class="ciblage-timer-display" id="ciblage-timer-display">25:00</div>
+      <div class="ciblage-timer-display" id="ciblage-timer-display">30:00</div>
     </div>
   </header>
 
@@ -1336,7 +1339,7 @@ Le non-respect des délais peut entraîner la disqualification de votre candidat
       </a>
     </div>
 
-    <p class="op-section-title">Déposer votre fichier complété</p>
+    <p class="op-section-title">Déposer votre fichier Excel complété (obligatoire)</p>
     <div class="op-upload-zone" id="ciblage-upload-zone"
          ondragover="ciblageDragOver(event)" ondragleave="ciblageDragLeave(event)" ondrop="ciblageDrop(event)"
          onclick="document.getElementById('ciblage-file-input').click()">
@@ -1351,6 +1354,23 @@ Le non-respect des délais peut entraîner la disqualification de votre candidat
       <span>📊</span>
       <span class="op-file-name" id="ciblage-file-name">fichier.xlsx</span>
       <span class="op-file-remove" onclick="ciblageRemoveFile()">Retirer</span>
+    </div>
+
+    <p class="op-section-title" style="margin-top:24px">Fichier complémentaire (optionnel) — par exemple un one pager</p>
+    <div class="op-upload-zone" id="ciblage-upload-zone-2"
+         ondragover="ciblageDragOver2(event)" ondragleave="ciblageDragLeave2(event)" ondrop="ciblageDrop2(event)"
+         onclick="document.getElementById('ciblage-file-input-2').click()">
+      <div class="op-upload-icon">📄</div>
+      <div class="op-upload-label">Glissez votre fichier ici ou cliquez pour sélectionner</div>
+      <div class="op-upload-sub">PDF, Word, PowerPoint, Excel ou image — 20 Mo max</div>
+    </div>
+    <input type="file" id="ciblage-file-input-2" accept=".pdf,.doc,.docx,.ppt,.pptx,.xlsx,.xls,.png,.jpg,.jpeg"
+           style="display:none" onchange="ciblageFile2Selected(event)">
+
+    <div class="op-file-preview hidden" id="ciblage-file-preview-2">
+      <span>📄</span>
+      <span class="op-file-name" id="ciblage-file-name-2">fichier</span>
+      <span class="op-file-remove" onclick="ciblageRemoveFile2()">Retirer</span>
     </div>
 
     <button class="btn-primary" id="btn-submit-ciblage" onclick="submitCiblage()" disabled>
@@ -1381,7 +1401,7 @@ Le non-respect des délais peut entraîner la disqualification de votre candidat
 <div class="modal-overlay" id="modal-ciblage-confirm">
   <div class="modal-box">
     <h3>⏱ Confirmer le démarrage ?</h3>
-    <p>Le chronomètre de <strong>25 minutes</strong> démarrera immédiatement et ne pourra pas être mis en pause. Assurez-vous d'être prêt.</p>
+    <p>Le chronomètre de <strong>30 minutes</strong> démarrera immédiatement et ne pourra pas être mis en pause. Assurez-vous d'être prêt.</p>
     <div class="modal-actions">
       <button class="btn-secondary"
               onclick="document.getElementById('modal-ciblage-confirm').classList.remove('open')">
@@ -2495,7 +2515,7 @@ async function startCiblage() {
 
   try {
     const now      = new Date();
-    const deadline = new Date(now.getTime() + 25 * 60 * 1000).toISOString();
+    const deadline = new Date(now.getTime() + 30 * 60 * 1000).toISOString();
 
     // Get fichier_ciblage_url from session if not already loaded
     if (!state.fichierCiblageUrl && state.session.fichier_ciblage_url) {
@@ -2551,6 +2571,7 @@ function loadCiblageActiveScreen() {
   }
 
   // Reset upload
+  ciblageRemoveFile2();
   state.ciblageFileObj = null;
   document.getElementById('ciblage-file-preview').classList.add('hidden');
   document.getElementById('ciblage-upload-zone').style.display = '';
@@ -2611,7 +2632,7 @@ function handleCiblageExpiry() {
         promo:  state.session.promo || state.session.code,
         started_at:    state.ciblageAssignment.started_at,
         submitted_at:  new Date().toISOString(),
-        duree_minutes: 25,
+        duree_minutes: 30,
         statut: 'expire',
         fichier_url: null,
       },
@@ -2622,7 +2643,7 @@ function handleCiblageExpiry() {
   document.getElementById('ciblage-end-icon').textContent = '⏰';
   document.getElementById('ciblage-end-title').textContent = 'Temps écoulé';
   document.getElementById('ciblage-end-text').innerHTML =
-    'Le délai de 25 minutes est dépassé.<br><br>L\'équipe AUDUN Partners a été notifiée.';
+    'Le délai de 30 minutes est dépassé.<br><br>L\'équipe AUDUN Partners a été notifiée.';
   setTimeout(() => showScreen('screen-ciblage-end'), 2500);
 }
 
@@ -2646,6 +2667,69 @@ function ciblageRemoveFile() {
   document.getElementById('ciblage-upload-zone').style.display = '';
   document.getElementById('ciblage-file-input').value = '';
   document.getElementById('btn-submit-ciblage').disabled = true;
+}
+
+// ---- Fichier complémentaire (optionnel) ----
+function ciblageDragOver2(e) { e.preventDefault(); document.getElementById('ciblage-upload-zone-2').classList.add('dragover'); }
+function ciblageDragLeave2() { document.getElementById('ciblage-upload-zone-2').classList.remove('dragover'); }
+function ciblageDrop2(e) {
+  e.preventDefault();
+  document.getElementById('ciblage-upload-zone-2').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) processCiblageFile2(file);
+}
+function ciblageFile2Selected(e) { const f = e.target.files[0]; if (f) processCiblageFile2(f); }
+function ciblageRemoveFile2() {
+  state.ciblageFile2Obj = null;
+  state.ciblageFile2Url = null;
+  state.ciblageFile2Nom = null;
+  const p = document.getElementById('ciblage-file-preview-2'); if (p) p.classList.add('hidden');
+  const z = document.getElementById('ciblage-upload-zone-2'); if (z) z.style.display = '';
+  const i = document.getElementById('ciblage-file-input-2'); if (i) i.value = '';
+}
+function ciblageCombinedUrl() {
+  return [state.ciblageUploadedUrl, state.ciblageFile2Url].filter(Boolean).join(' ') || null;
+}
+function ciblageCombinedNom() {
+  return [state.ciblageUploadedNom, state.ciblageFile2Nom].filter(Boolean).join(' / ') || null;
+}
+async function uploadCiblageFile2(file) {
+  const ext = file.name.split('.').pop();
+  const path = 'submissions/' + state.candidate.id + '/' + Date.now() + '_complement.' + ext;
+  const res = await fetch(SUPABASE_URL + '/storage/v1/object/onepager-files/' + path, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON,
+      'Authorization': 'Bearer ' + SUPABASE_ANON,
+      'Content-Type': file.type || 'application/octet-stream',
+      'x-upsert': 'true',
+    },
+    body: file,
+  });
+  if (!res.ok) throw new Error('Upload complément ' + res.status);
+  state.ciblageFile2Url = SUPABASE_URL + '/storage/v1/object/public/onepager-files/' + path;
+  state.ciblageFile2Nom = file.name;
+}
+async function processCiblageFile2(file) {
+  if (!file.name.match(/\.(pdf|docx?|pptx?|xlsx?|png|jpe?g)$/i)) {
+    toast('Format non accepté (PDF, Word, PowerPoint, Excel ou image).', 'warn'); return;
+  }
+  if (file.size > 20 * 1024 * 1024) { toast('Fichier trop volumineux (max 20 Mo).', 'warn'); return; }
+  state.ciblageFile2Obj = file;
+  state.ciblageFile2Url = null;
+  document.getElementById('ciblage-file-name-2').textContent = file.name;
+  document.getElementById('ciblage-file-preview-2').classList.remove('hidden');
+  document.getElementById('ciblage-upload-zone-2').style.display = 'none';
+  try {
+    await uploadCiblageFile2(file);
+    if (state.ciblageUploadedUrl) {
+      sbFetch('/rest/v1/ciblage_assignments?id=eq.' + state.ciblageAssignment.id, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ fichier_rendu_url: ciblageCombinedUrl(), fichier_rendu_nom: ciblageCombinedNom() }),
+      }).catch(() => {});
+    }
+  } catch { /* nouvel essai à la soumission */ }
 }
 
 async function processCiblageFile(file) {
@@ -2685,7 +2769,7 @@ async function processCiblageFile(file) {
       sbFetch(`/rest/v1/ciblage_assignments?id=eq.${state.ciblageAssignment.id}`, {
         method: 'PATCH',
         headers: { Prefer: 'return=minimal' },
-        body: JSON.stringify({ fichier_rendu_url: state.ciblageUploadedUrl, fichier_rendu_nom: file.name }),
+        body: JSON.stringify({ fichier_rendu_url: ciblageCombinedUrl(), fichier_rendu_nom: ciblageCombinedNom() }),
       }).catch(() => {});
     }
   } catch { /* ignore — will retry on submit */ }
@@ -2720,6 +2804,10 @@ async function submitCiblage() {
       state.ciblageUploadedNom = file.name;
     }
 
+    if (state.ciblageFile2Obj && !state.ciblageFile2Url) {
+      try { await uploadCiblageFile2(state.ciblageFile2Obj); } catch (e2) { console.warn(e2); }
+    }
+
     await finalizeCiblageSubmission('soumis');
 
   } catch(e) {
@@ -2742,8 +2830,8 @@ async function finalizeCiblageSubmission(statut) {
     body: JSON.stringify({
       submitted_at:    submittedAt,
       statut:          statut,
-      fichier_rendu_url: state.ciblageUploadedUrl,
-      fichier_rendu_nom: state.ciblageUploadedNom,
+      fichier_rendu_url: ciblageCombinedUrl(),
+      fichier_rendu_nom: ciblageCombinedNom(),
     }),
   });
 
@@ -2764,6 +2852,7 @@ async function finalizeCiblageSubmission(statut) {
         duree_minutes: dureeMins,
         statut,
         fichier_url:   state.ciblageUploadedUrl,
+        fichier_complement_url: state.ciblageFile2Url || null,
       },
     }),
   }).catch(() => {});
