@@ -1918,8 +1918,8 @@ async function loadCiblageResultats() {
         ? Math.round((new Date(a.submitted_at) - new Date(a.started_at)) / 60000) + ' min'
         : '—';
       const fichierLink = a.fichier_rendu_url
-        ? `<a href="${a.fichier_rendu_url}" target="_blank"
-              style="color:var(--blue-light);text-decoration:none">↗ Télécharger</a>`
+        ? String(a.fichier_rendu_url).split(' ').filter(Boolean).map((u, i) =>
+            `<a href="${u}" target="_blank" style="color:var(--blue-light);text-decoration:none;display:block">↗ ${i === 0 ? 'Excel' : 'Complément'}</a>`).join('')
         : '—';
       return `<tr>
         <td><strong style="color:var(--text-primary)">${cand.prenom || '—'} ${cand.nom || ''}</strong></td>
